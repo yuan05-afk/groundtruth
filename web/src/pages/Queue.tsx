@@ -328,26 +328,26 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
               Satellite
             </button>
           </div>
-        </div>
-        <div className="legend" aria-label="Legend">
-          {LABEL_ORDER.map((l) => (
-            <span key={l}>
-              <i className={`dot dot-${l}`} aria-hidden="true" />
-              {LABELS[l].short}
-            </span>
-          ))}
-          {selected && (
-            <>
-              <span>
-                <i className="legend-dash claimed" aria-hidden="true" />
-                Claimed town
+          <div className="legend" aria-label="Legend">
+            {LABEL_ORDER.map((l) => (
+              <span key={l}>
+                <i className={`dot dot-${l}`} aria-hidden="true" />
+                {LABELS[l].short}
               </span>
-              <span>
-                <i className="legend-dash water" aria-hidden="true" />
-                Named river
-              </span>
-            </>
-          )}
+            ))}
+            {selected && (
+              <>
+                <span>
+                  <i className="legend-dash claimed" aria-hidden="true" />
+                  Claimed town
+                </span>
+                <span>
+                  <i className="legend-dash water" aria-hidden="true" />
+                  Named river
+                </span>
+              </>
+            )}
+          </div>
         </div>
         {selected && (
           <EvidenceCard
