@@ -536,19 +536,22 @@ h3 {
 /* Two-column desktop/laptop: first view = brand, CTAs, note, and figure. */
 @media (min-width: 981px) {
   .brief {
-    padding-top: 1.15rem;
+    padding-top: 1.25rem;
   }
 
   .hero {
-    min-height: calc(100dvh - var(--topbar) - 1.5rem);
-    max-height: calc(100dvh - var(--topbar) - 1.5rem);
-    align-content: center;
+    /* Fill the first view without floating the copy in mid-air. */
+    min-height: calc(100dvh - var(--topbar) - 1.75rem);
+    align-items: center;
+    align-content: start;
     overflow: visible;
     box-sizing: border-box;
+    padding-top: 0.35rem;
+    padding-bottom: 1.25rem;
   }
 
   .hero-figure {
-    max-height: calc(100dvh - var(--topbar) - 3.25rem);
+    max-height: calc(100dvh - var(--topbar) - 3.5rem);
     display: flex;
     flex-direction: column;
   }
@@ -565,7 +568,7 @@ h3 {
   }
 
   .hero-beats {
-    margin-top: 0.25rem;
+    margin-top: 0.15rem;
   }
 }
 
