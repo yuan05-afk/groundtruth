@@ -273,36 +273,32 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
             'line-dasharray': [1.5, 1.5],
           },
         })
-        // Claimed-town mark (dashed ring + hollow core) — pairs with the recorded pin, like the Brief locator.
-        if (!map.hasImage('claimed-mark')) {
-          map.addImage('claimed-mark', makeClaimedMarkImage(), { pixelRatio: 2 })
-        }
+        // Claimed-town mark — hollow ring + white core (pairs with the filled recorded pin).
         map.addLayer({
-          id: 'sel-claimed',
-          type: 'symbol',
-          source: 'sel',
-          filter: ['==', ['get', 'kind'], 'claimed'],
-          layout: {
-            'icon-image': 'claimed-mark',
-            'icon-size': 1,
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true,
-          },
-        })
-        // Fallback ring under the icon so a claimed mark is never invisible if the sprite fails.
-        map.addLayer({
-          id: 'sel-claimed-fallback',
+          id: 'sel-claimed-ring',
           type: 'circle',
           source: 'sel',
           filter: ['==', ['get', 'kind'], 'claimed'],
           paint: {
-            'circle-radius': 13,
-            'circle-color': 'rgba(255,255,255,0.55)',
+            'circle-radius': 14,
+            'circle-color': 'rgba(255,255,255,0.92)',
             'circle-stroke-color': '#0a0a0a',
-            'circle-stroke-width': 1.5,
-            'circle-stroke-opacity': 0.35,
+            'circle-stroke-width': 1.6,
+            'circle-stroke-opacity': 1,
           },
-        }, 'sel-claimed')
+        })
+        map.addLayer({
+          id: 'sel-claimed-core',
+          type: 'circle',
+          source: 'sel',
+          filter: ['==', ['get', 'kind'], 'claimed'],
+          paint: {
+            'circle-radius': 3.25,
+            'circle-color': '#ffffff',
+            'circle-stroke-color': '#0a0a0a',
+            'circle-stroke-width': 1.4,
+          },
+        })
         map.addLayer({
           id: 'sel-related',
           type: 'circle',
@@ -609,33 +605,6 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
   }, [selected, related, drawerOpen])
 
   return <div ref={ref} className="map" />
-}
-
-/** Dashed ring + hollow core — matches the Brief locator "claimed town" mark. */
-function makeClaimedMarkImage(): ImageData {
-  const size = 64
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')
-  if (!ctx) {
-    return new ImageData(size, size)
-  }
-  ctx.clearRect(0, 0, size, size)
-  ctx.strokeStyle = '#0a0a0a'
-  ctx.lineWidth = 2.75
-  ctx.setLineDash([6, 4.5])
-  ctx.beginPath()
-  ctx.arc(size / 2, size / 2, 22, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.setLineDash([])
-  ctx.lineWidth = 2
-  ctx.fillStyle = '#ffffff'
-  ctx.beginPath()
-  ctx.arc(size / 2, size / 2, 4.5, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.stroke()
-  return ctx.getImageData(0, 0, size, size)
 }
 
 function haversineKm(a: [number, number], b: [number, number]) {
