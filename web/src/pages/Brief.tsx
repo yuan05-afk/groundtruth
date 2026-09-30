@@ -98,7 +98,7 @@ export function Brief() {
           <motion.p className="hero-brand" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
             GroundTruth
           </motion.p>
-          <motion.p className="eyebrow" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+          <motion.p className="eyebrow hero-eyebrow" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
             Flood-control verification, Philippines, {summary ? fmtInt(summary.records) : '9,855'} contracts
           </motion.p>
           <motion.h1 variants={fadeUp} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
@@ -108,6 +108,17 @@ export function Brief() {
           <motion.p className="lede" variants={fadeUp} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
             GroundTruth is an inspection queue for the ₱547B flood-control record: it measures whether each contract's
             pin matches the town it claims, then sorts what to fix on paper, what to visit, and what to leave alone.
+          </motion.p>
+          <motion.div className="hero-actions" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+            <a className="btn btn-primary" href="#/queue">
+              Open the inspection queue
+            </a>
+            <a className="btn btn-quiet" href="#/method">
+              How it decides
+            </a>
+          </motion.div>
+          <motion.p className="hero-note" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+            Triage, not a verdict. Every flag shows the innocent explanation.
           </motion.p>
           <motion.ol className="hero-beats" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
             <li>
@@ -138,17 +149,6 @@ export function Brief() {
               </div>
             </li>
           </motion.ol>
-          <motion.div className="hero-actions" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
-            <a className="btn btn-primary" href="#/queue">
-              Open the inspection queue
-            </a>
-            <a className="btn btn-quiet" href="#/method">
-              How it decides
-            </a>
-          </motion.div>
-          <motion.p className="hero-note" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
-            Triage, not a verdict. Every flag shows the innocent explanation.
-          </motion.p>
         </motion.div>
 
         <motion.figure
@@ -162,8 +162,8 @@ export function Brief() {
               <Locator
                 shapes={caseShapes(hero)}
                 pin={[hero.project.lat, hero.project.lon]}
-                width={560}
-                height={440}
+                width={520}
+                height={360}
                 distanceLabel={fmtKm(hero.project.md ?? 0)}
                 pinLabel="Recorded pin"
               />
