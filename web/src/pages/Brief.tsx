@@ -95,12 +95,9 @@ export function Brief() {
           animate="animate"
           transition={{ staggerChildren: 0.08, delayChildren: 0.05 }}
         >
-          <motion.div className="hero-masthead" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
-            <p className="hero-brand">GroundTruth</p>
-            <p className="eyebrow hero-eyebrow">
-              Flood-control verification, Philippines, {summary ? fmtInt(summary.records) : '9,855'} contracts
-            </p>
-          </motion.div>
+          <motion.p className="eyebrow hero-eyebrow" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+            Flood-control verification, Philippines, {summary ? fmtInt(summary.records) : '9,855'} contracts
+          </motion.p>
           <motion.h1 variants={fadeUp} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
             Public flood projects claim a town.
             <em> Many pins are somewhere else.</em>
@@ -109,6 +106,35 @@ export function Brief() {
             GroundTruth is an inspection queue for the ₱547B flood-control record: it measures whether each contract's
             pin matches the town it claims, then sorts what to fix on paper, what to visit, and what to leave alone.
           </motion.p>
+          <motion.ol className="hero-beats" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+            <li>
+              <span className="hero-beat-n" aria-hidden="true">
+                01
+              </span>
+              <div className="hero-beat-body">
+                <strong>Problem</strong>
+                <p>A missing structure at the pin may be a ghost, or a wrong coordinate.</p>
+              </div>
+            </li>
+            <li>
+              <span className="hero-beat-n" aria-hidden="true">
+                02
+              </span>
+              <div className="hero-beat-body">
+                <strong>Check</strong>
+                <p>Boundaries, rivers, and duplicate pins across all published contracts.</p>
+              </div>
+            </li>
+            <li>
+              <span className="hero-beat-n" aria-hidden="true">
+                03
+              </span>
+              <div className="hero-beat-body">
+                <strong>Output</strong>
+                <p>A ranked queue with evidence, not a guilt ranking.</p>
+              </div>
+            </li>
+          </motion.ol>
           <motion.div className="hero-actions" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
             <a className="btn btn-primary" href="#/queue">
               Open the inspection queue
@@ -117,9 +143,6 @@ export function Brief() {
               How it decides
             </a>
           </motion.div>
-          <motion.p className="hero-note" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
-            Triage, not a verdict. Every flag shows the innocent explanation.
-          </motion.p>
         </motion.div>
 
         <motion.figure
@@ -133,8 +156,8 @@ export function Brief() {
               <Locator
                 shapes={caseShapes(hero)}
                 pin={[hero.project.lat, hero.project.lon]}
-                width={520}
-                height={360}
+                width={560}
+                height={400}
                 distanceLabel={fmtKm(hero.project.md ?? 0)}
                 pinLabel="Recorded pin"
               />
@@ -147,41 +170,6 @@ export function Brief() {
           )}
         </motion.figure>
       </section>
-
-      <motion.ol
-        className="hero-beats"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <li>
-          <span className="hero-beat-n" aria-hidden="true">
-            01
-          </span>
-          <div className="hero-beat-body">
-            <strong>Problem</strong>
-            <p>A missing structure at the pin may be a ghost, or a wrong coordinate.</p>
-          </div>
-        </li>
-        <li>
-          <span className="hero-beat-n" aria-hidden="true">
-            02
-          </span>
-          <div className="hero-beat-body">
-            <strong>Check</strong>
-            <p>Boundaries, rivers, and duplicate pins across all published contracts.</p>
-          </div>
-        </li>
-        <li>
-          <span className="hero-beat-n" aria-hidden="true">
-            03
-          </span>
-          <div className="hero-beat-body">
-            <strong>Output</strong>
-            <p>A ranked queue with evidence, not a guilt ranking.</p>
-          </div>
-        </li>
-      </motion.ol>
 
       {summary && (
         <motion.section

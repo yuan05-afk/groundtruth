@@ -128,13 +128,14 @@ h3 {
 
 .hero-beats {
   list-style: none;
-  margin: 0 0 0;
-  padding: 1rem 0 1.5rem;
-  border-bottom: 1px solid var(--line);
+  margin: 0 0 1.15rem;
+  padding: 0.85rem 0 0;
+  border-top: 1px solid var(--ink);
+  border-bottom: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.65rem 1.25rem;
-  max-width: none;
+  gap: 0.65rem 0.9rem;
+  max-width: 38rem;
   counter-reset: none;
 }
 
@@ -146,14 +147,14 @@ h3 {
   margin: 0;
   padding: 0;
   border: 0;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   line-height: 1.35;
   color: var(--ink-2);
 }
 
 .hero-beat-n {
   font-family: var(--mono);
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   color: var(--ink);
@@ -163,7 +164,7 @@ h3 {
 .hero-beat-body strong {
   display: block;
   font-family: var(--display);
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--ink);
@@ -174,7 +175,7 @@ h3 {
 .hero-beat-body p {
   margin: 0;
   color: var(--ink-3);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   line-height: 1.4;
 }
 
@@ -270,8 +271,8 @@ h3 {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  min-height: 2.65rem;
-  padding: 0.6rem 1.25rem;
+  min-height: 2.85rem;
+  padding: 0.7rem 1.4rem;
   border: 1px solid var(--ink);
   border-radius: var(--radius);
   background: var(--ink);
@@ -406,53 +407,35 @@ h3 {
 /* -- Brief / landing -- */
 
 .brief {
-  max-width: 1180px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 1.5rem 1.5rem 5rem;
+  padding: 2rem 1.75rem 5rem;
 }
 
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 2rem 2.75rem;
+  gap: 2.25rem 3rem;
   align-items: center;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--ink);
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--line);
 }
 
 .hero-text {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.hero-masthead {
-  margin: 0 0 1.15rem;
-}
-
-.hero-brand {
-  font-family: var(--display);
-  font-size: clamp(1.55rem, 2.8vw, 2.05rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  text-transform: none;
-  color: var(--ink);
-  margin: 0 0 0.4rem;
-  line-height: 1.05;
 }
 
 .hero-eyebrow {
-  margin: 0;
-  max-width: 34rem;
-  line-height: 1.45;
+  margin: 0 0 1.15rem;
+  max-width: 40rem;
 }
 
 .hero h1 {
-  font-size: clamp(1.85rem, 3.6vw, 2.85rem);
+  font-size: clamp(2.1rem, 4.2vw, 3.15rem);
   font-weight: 500;
-  margin: 0 0 0.85rem;
-  max-width: 16ch;
+  margin: 0 0 1rem;
+  max-width: 15ch;
+  line-height: 1.12;
 }
 
 .hero h1 em {
@@ -460,29 +443,21 @@ h3 {
   font-style: italic;
   font-weight: 400;
   color: var(--ink-2);
-  margin-top: 0.25rem;
+  margin-top: 0.3rem;
 }
 
 .hero .lede {
-  margin: 0 0 1.1rem;
-  font-size: 0.98rem;
-  line-height: 1.5;
-  max-width: 34rem;
+  margin: 0 0 1.15rem;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  max-width: 36rem;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.55rem;
-  margin: 0 0 0.65rem;
-}
-
-.hero-note {
+  gap: 0.65rem;
   margin: 0;
-  font-size: 0.8rem;
-  color: var(--ink-3);
-  max-width: 32rem;
-  line-height: 1.4;
 }
 
 .hero-figure {
@@ -505,17 +480,17 @@ h3 {
 .context-figure figcaption,
 .case figcaption {
   margin: 0;
-  padding: 0.7rem 0.9rem;
+  padding: 0.75rem 1rem;
   border-top: 1px solid var(--line);
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   color: var(--ink-3);
-  line-height: 1.4;
+  line-height: 1.45;
   background: var(--paper);
 }
 
 .fig-no {
   font-family: var(--mono);
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-4);
@@ -523,7 +498,7 @@ h3 {
 }
 
 .figure-placeholder {
-  aspect-ratio: 520 / 360;
+  aspect-ratio: 560 / 400;
   background: var(--paper-2);
   display: grid;
   place-items: center;
@@ -533,102 +508,48 @@ h3 {
   letter-spacing: 0.06em;
 }
 
-/* Two-column desktop/laptop: first view = brand, CTAs, note, and figure. */
-@media (min-width: 981px) {
+/* Desktop/laptop: keep the original scale. Only tighten on short windows. */
+@media (min-width: 1100px) {
+  .hero {
+    gap: 2.5rem 3.75rem;
+  }
+}
+
+@media (min-width: 981px) and (max-height: 760px) {
   .brief {
     padding-top: 1.25rem;
   }
 
   .hero {
-    /* Fill the first view without floating the copy in mid-air. */
-    min-height: calc(100dvh - var(--topbar) - 1.75rem);
-    align-items: center;
-    align-content: start;
-    overflow: visible;
-    box-sizing: border-box;
-    padding-top: 0.35rem;
+    gap: 1.5rem 2.25rem;
     padding-bottom: 1.25rem;
   }
 
-  .hero-figure {
-    max-height: calc(100dvh - var(--topbar) - 3.5rem);
-    display: flex;
-    flex-direction: column;
-  }
-
-  .hero-figure .locator,
-  .hero-figure .figure-placeholder {
-    flex: 1 1 auto;
-    min-height: 0;
-    max-height: min(340px, calc(100dvh - var(--topbar) - 8.5rem));
-  }
-
-  .hero-figure figcaption {
-    flex: 0 0 auto;
-  }
-
-  .hero-beats {
-    margin-top: 0.15rem;
-  }
-}
-
-@media (min-width: 1100px) {
-  .hero {
-    gap: 2.5rem 3.5rem;
-  }
-
-  .hero-masthead {
-    margin-bottom: 1.35rem;
-  }
-}
-
-/* Short laptop windows: keep brand + CTAs + figure in the first view. */
-@media (min-width: 981px) and (max-height: 820px) {
-  .hero {
-    gap: 1.25rem 2rem;
-    padding-bottom: 1rem;
-  }
-
-  .hero-masthead {
+  .hero-eyebrow {
     margin-bottom: 0.75rem;
-  }
-
-  .hero-brand {
-    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
-    margin-bottom: 0.25rem;
   }
 
   .hero h1 {
-    font-size: clamp(1.55rem, 2.8vw, 2.15rem);
-    margin-bottom: 0.55rem;
+    font-size: clamp(1.85rem, 3.4vw, 2.55rem);
+    margin-bottom: 0.7rem;
   }
 
   .hero .lede {
-    font-size: 0.9rem;
-    line-height: 1.45;
-    margin-bottom: 0.75rem;
+    font-size: 0.98rem;
+    margin-bottom: 0.85rem;
   }
 
-  .hero-actions {
-    margin-bottom: 0.45rem;
+  .hero-beats {
+    margin-bottom: 0.85rem;
+    padding-top: 0.65rem;
   }
 
-  .hero-note {
-    font-size: 0.75rem;
-  }
-
-  .hero-figure .locator,
-  .hero-figure .figure-placeholder {
-    max-height: min(280px, calc(100dvh - var(--topbar) - 7rem));
-  }
-
-  .hero-figure figcaption {
-    padding: 0.55rem 0.75rem;
-    font-size: 0.7rem;
+  .hero-beat-body p {
+    display: none;
   }
 }
 
-@media (min-width: 981px) and (max-height: 700px) {
+@media (min-width: 981px) and (max-height: 680px) {
   .hero .lede {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -638,11 +559,6 @@ h3 {
 
   .hero-figure figcaption {
     display: none;
-  }
-
-  .hero-figure .locator,
-  .hero-figure .figure-placeholder {
-    max-height: min(240px, calc(100dvh - var(--topbar) - 5.5rem));
   }
 }
 
