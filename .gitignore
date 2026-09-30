@@ -34,3 +34,5 @@ pipeline/data/raw/adm3_full.geojson
 
 # Nested clone metadata inside raw SSP mirror
 pipeline/data/raw/ssp/.git/
+.vercel
+.env*
