@@ -341,11 +341,13 @@ export function Locator({
       </g>
 
       <g className="locator-legend" transform={`translate(12, ${height - 44})`}>
-        <rect x="0" y="0" width="12" height="12" className="locator-claimed" fill={`url(#${hatchId})`} />
+        <circle cx="6" cy="6" r="7" className="locator-claimed-mark" fill={`url(#${hatchId})`} />
+        <circle cx="6" cy="6" r="2.5" className="locator-claimed-dot" />
         <text x="18" y="10" className="locator-legend-text">
           Claimed in record
         </text>
-        <circle cx="6" cy="28" r="4" className="locator-pin" />
+        <circle cx="6" cy="28" r="7" className="locator-pin-ring" />
+        <circle cx="6" cy="28" r="3.5" className="locator-pin" />
         <text x="18" y="31" className="locator-legend-text">
           {stack > 0 ? 'Shared pin' : 'Recorded pin'}
         </text>

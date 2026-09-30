@@ -332,22 +332,35 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
         <div className={`map-legend-dock${selected ? ' is-drawer-open' : ''}`} aria-label="Legend">
           <div className="map-legend-gutter" aria-hidden="true" />
           <div className="legend">
-            {LABEL_ORDER.map((l) => (
-              <span key={l}>
-                <i className={`dot dot-${l}`} aria-hidden="true" />
-                {LABELS[l].short}
-              </span>
-            ))}
-            {selected && (
+            {!selected ? (
+              LABEL_ORDER.map((l) => (
+                <span key={l}>
+                  <i className={`legend-pin legend-pin-${l}`} aria-hidden="true" />
+                  {LABELS[l].short}
+                </span>
+              ))
+            ) : (
               <>
                 <span>
-                  <i className="legend-dash claimed" aria-hidden="true" />
-                  Claimed town
+                  <i className="legend-mark legend-mark-pin" aria-hidden="true" />
+                  Recorded pin
                 </span>
                 <span>
-                  <i className="legend-dash water" aria-hidden="true" />
-                  Named river
+                  <i className="legend-mark legend-mark-claimed" aria-hidden="true" />
+                  Claimed town
                 </span>
+                {selected.wp && selected.wd !== null && selected.wd > 0.05 && (
+                  <span>
+                    <i className="legend-mark legend-mark-water" aria-hidden="true" />
+                    Named river
+                  </span>
+                )}
+                {related.length > 0 && (
+                  <span>
+                    <i className="legend-mark legend-mark-related" aria-hidden="true" />
+                    Related contract
+                  </span>
+                )}
               </>
             )}
           </div>

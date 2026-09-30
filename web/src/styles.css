@@ -1225,8 +1225,89 @@ h3 {
 .legend span {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
   white-space: nowrap;
+}
+
+/* Queue pin colors as circles (match the map markers). */
+.legend-pin {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.legend-pin-records {
+  background: var(--ink);
+}
+.legend-pin-field {
+  background: #4a4a4a;
+  box-shadow: inset 0 0 0 1px #fff;
+}
+.legend-pin-low {
+  background: var(--low);
+}
+.legend-pin-insufficient {
+  background: #d8d8d8;
+  box-shadow: inset 0 0 0 1px var(--ink-4);
+}
+
+/* Selected-inspection marks — same language as the Brief locator. */
+.legend-mark {
+  position: relative;
+  display: inline-block;
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.legend-mark-pin {
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+}
+.legend-mark-pin::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 1.5px solid #fff;
+  box-sizing: border-box;
+}
+
+.legend-mark-claimed {
+  border-radius: 50%;
+  border: 1.5px dashed var(--ink);
+  background: #fff;
+}
+.legend-mark-claimed::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.28rem;
+  height: 0.28rem;
+  margin: -0.14rem 0 0 -0.14rem;
+  border-radius: 50%;
+  border: 1px solid var(--ink);
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.legend-mark-water {
+  border-radius: 50%;
+  background: #555;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px #555;
+}
+
+.legend-mark-related {
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  background: transparent;
 }
 
 .legend-dash {

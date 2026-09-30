@@ -273,6 +273,22 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
             'line-dasharray': [1.5, 1.5],
           },
         })
+        // Claimed-town mark (dashed ring + hollow core) — pairs with the recorded pin, like the Brief locator.
+        if (!map.hasImage('claimed-mark')) {
+          map.addImage('claimed-mark', makeClaimedMarkImage())
+        }
+        map.addLayer({
+          id: 'sel-claimed',
+          type: 'symbol',
+          source: 'sel',
+          filter: ['==', ['get', 'kind'], 'claimed'],
+          layout: {
+            'icon-image': 'claimed-mark',
+            'icon-size': 0.55,
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
+          },
+        })
         map.addLayer({
           id: 'sel-related',
           type: 'circle',
@@ -320,7 +336,24 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
             'text-field': ['get', 'text'],
             'text-font': ['Noto Sans Regular'],
             'text-size': 12,
-            'text-offset': [0, -1.1],
+            'text-offset': [
+              'match',
+              ['get', 'role'],
+              'pin',
+              ['literal', [0, 1.85]],
+              'claimed',
+              ['literal', [0, -1.85]],
+              ['literal', [0, -1.1]],
+            ],
+            'text-anchor': [
+              'match',
+              ['get', 'role'],
+              'pin',
+              'top',
+              'claimed',
+              'bottom',
+              'center',
+            ],
             'text-allow-overlap': true,
           },
           paint: {
@@ -484,7 +517,14 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
       munisSrc.setData({ type: 'FeatureCollection', features: muniFeatures })
 
       const pin: [number, number] = [p.lon, p.lat]
-      const features: GeoJSON.Feature[] = [{ type: 'Feature', geometry: { type: 'Point', coordinates: pin }, properties: { kind: 'pin' } }]
+      const features: GeoJSON.Feature[] = [
+        { type: 'Feature', geometry: { type: 'Point', coordinates: pin }, properties: { kind: 'pin' } },
+        {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: pin },
+          properties: { kind: 'label', role: 'pin', text: 'Recorded pin' },
+        },
+      ]
       const bounds = new LngLatBounds(pin, pin)
 
       const disagree = p.sig.find((s) => s.code === 'record_fields_disagree')
@@ -494,16 +534,33 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
         const bb = bboxOf(f)
         const c = centroidOf(f)
         const measured = m === p.sm ? (p.md ?? 0) : (disagree?.value ?? haversineKm(pin, c))
-        if (p.am !== m && measured > 3) {
+        const far = p.am !== m && measured > 3
+        // Always mark the claimed town so both sides of the mismatch are visible, like the Brief locator.
+        features.push({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: c },
+          properties: { kind: 'claimed' },
+        })
+        features.push({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: c },
+          properties: {
+            kind: 'label',
+            role: 'claimed',
+            text: far ? `${f.properties.name} (claimed)` : `${f.properties.name}`,
+          },
+        })
+        if (far) {
           features.push({ type: 'Feature', geometry: { type: 'LineString', coordinates: [pin, c] }, properties: { kind: 'line', role: 'muni' } })
           features.push({
             type: 'Feature',
             geometry: { type: 'Point', coordinates: [(pin[0] + c[0]) / 2, (pin[1] + c[1]) / 2] },
-            properties: { kind: 'label', role: 'muni', text: `${f.properties.name}: ${fmtKm(measured)} from the pin` },
+            properties: { kind: 'label', role: 'muni', text: `${fmtKm(measured)} from the pin` },
           })
         }
         bounds.extend([bb[0], bb[1]])
         bounds.extend([bb[2], bb[3]])
+        bounds.extend(c)
       }
       if (p.wp && p.wd !== null && p.wd > 0.05) {
         const w: [number, number] = [p.wp[1], p.wp[0]]
@@ -538,6 +595,38 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
   }, [selected, related, drawerOpen])
 
   return <div ref={ref} className="map" />
+}
+
+/** Dashed ring + hollow core — matches the Brief locator "claimed town" mark. */
+function makeClaimedMarkImage(): {
+  width: number
+  height: number
+  data: Uint8Array
+} {
+  const size = 64
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    return { width: size, height: size, data: new Uint8Array(size * size * 4) }
+  }
+  ctx.clearRect(0, 0, size, size)
+  ctx.strokeStyle = '#0a0a0a'
+  ctx.lineWidth = 2.75
+  ctx.setLineDash([6, 4.5])
+  ctx.beginPath()
+  ctx.arc(size / 2, size / 2, 22, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.setLineDash([])
+  ctx.lineWidth = 2
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.arc(size / 2, size / 2, 4.5, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.stroke()
+  const imageData = ctx.getImageData(0, 0, size, size)
+  return { width: size, height: size, data: new Uint8Array(imageData.data.buffer) }
 }
 
 function haversineKm(a: [number, number], b: [number, number]) {
