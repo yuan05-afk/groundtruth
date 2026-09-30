@@ -2,46 +2,29 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { BrandMark } from './BrandMark'
 
-const SESSION_KEY = 'gt-intro-seen'
-
 type Props = { onDone: () => void }
 
-/** One-shot opening: claim vs pin mismatch, the problem GroundTruth solves. */
+/**
+ * Full-page intro on hard refresh / first App mount only.
+ * SPA route changes do not remount App, so this does not replay while navigating.
+ */
 export function OpeningIntro({ onDone }: Props) {
   const doneRef = useRef(false)
-  const [show, setShow] = useState(() => {
-    try {
-      return sessionStorage.getItem(SESSION_KEY) !== '1'
-    } catch {
-      return true
-    }
-  })
+  const [show, setShow] = useState(true)
 
   const finish = () => {
     if (doneRef.current) return
     doneRef.current = true
-    try {
-      sessionStorage.setItem(SESSION_KEY, '1')
-    } catch {
-      /* ignore */
-    }
     setShow(false)
     onDone()
   }
 
   useEffect(() => {
-    if (!show) {
-      if (!doneRef.current) {
-        doneRef.current = true
-        onDone()
-      }
-      return
-    }
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const t = window.setTimeout(finish, reduce ? 350 : 4200)
     return () => window.clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show])
+  }, [])
 
   return (
     <AnimatePresence>

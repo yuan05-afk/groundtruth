@@ -1167,7 +1167,7 @@ h3 {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5rem;
-  max-width: min(34rem, calc(100% - 1.7rem));
+  max-width: min(16rem, calc(100% - 1.7rem));
   pointer-events: none;
 }
 
@@ -1175,8 +1175,69 @@ h3 {
   pointer-events: auto;
 }
 
-.stage:has(.card) .map-controls {
-  max-width: min(26rem, calc(100% - 1.7rem - min(26rem, 50%)));
+/* Sit beside MapLibre zoom + scale in the bottom-left corner. */
+.map-legend-dock {
+  --map-chrome-left: 0.85rem;
+  --map-chrome-bottom: 0.85rem;
+  --map-nav-gutter: 2.35rem;
+  --map-drawer-reserve: 0px;
+  --map-card-lift: 0px;
+  position: absolute;
+  left: var(--map-chrome-left);
+  bottom: calc(var(--map-chrome-bottom) + var(--map-card-lift));
+  z-index: 6;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.45rem;
+  max-width: calc(100% - (var(--map-chrome-left) * 2) - var(--map-drawer-reserve));
+  pointer-events: none;
+}
+
+.map-legend-gutter {
+  flex: 0 0 var(--map-nav-gutter);
+  width: var(--map-nav-gutter);
+  height: 4.6rem;
+}
+
+.stage:has(.card) .map-legend-dock {
+  --map-drawer-reserve: min(416px, calc(50% + 1rem));
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.65rem;
+  padding: 0.4rem 0.55rem;
+  min-width: 0;
+  flex: 1 1 auto;
+  width: max-content;
+  max-width: 100%;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--line);
+  font-size: 0.68rem;
+  color: var(--ink-3);
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.legend-dash {
+  display: inline-block;
+  width: 1rem;
+  height: 0;
+  border-top: 2px dashed var(--ink);
+}
+
+.legend-dash.water {
+  border-top-color: var(--water);
+  border-top-style: solid;
 }
 
 .segmented {
@@ -1196,39 +1257,6 @@ h3 {
 .segmented button.active {
   background: var(--ink);
   color: var(--paper);
-}
-
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem 0.75rem;
-  padding: 0.4rem 0.6rem;
-  width: max-content;
-  max-width: 100%;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid var(--line);
-  font-size: 0.68rem;
-  color: var(--ink-3);
-  pointer-events: none;
-}
-
-.legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.legend-dash {
-  display: inline-block;
-  width: 1rem;
-  height: 0;
-  border-top: 2px dashed var(--ink);
-}
-
-.legend-dash.water {
-  border-top-color: var(--water);
-  border-top-style: solid;
 }
 
 /* -- Evidence card -- */
@@ -1882,6 +1910,11 @@ h3 {
   box-sizing: border-box;
 }
 
+/* Lift zoom/scale with the legend when the evidence sheet covers the bottom. */
+.stage:has(.card) .maplibregl-ctrl-bottom-left {
+  transition: bottom 0.2s ease;
+}
+
 /* -- Responsive -- */
 
 @media (max-width: 980px) {
@@ -1945,7 +1978,19 @@ h3 {
     left: 0;
     bottom: 0;
     width: 100%;
-    max-height: 55%;
+    max-height: min(55%, 28rem);
+    z-index: 9;
+  }
+
+  /* Keep legend + zoom/scale above the bottom evidence sheet. */
+  .stage:has(.card) .map-legend-dock {
+    --map-drawer-reserve: 0px;
+    --map-card-lift: min(55%, 28rem);
+  }
+
+  .stage:has(.card) .maplibregl-ctrl-bottom-left {
+    bottom: min(55%, 28rem) !important;
+    margin-bottom: 0.55rem !important;
   }
 
   .stage:has(.card) .map-controls {
@@ -1982,6 +2027,43 @@ h3 {
 
   .hero h1 {
     max-width: none;
+  }
+
+  .map-controls {
+    top: 0.55rem;
+    left: 0.55rem;
+  }
+
+  .map-legend-dock {
+    --map-chrome-left: 0.55rem;
+    --map-chrome-bottom: 0.55rem;
+    --map-nav-gutter: 2.15rem;
+  }
+
+  .map-legend-gutter {
+    height: 4.25rem;
+  }
+
+  .legend {
+    font-size: 0.62rem;
+    gap: 0.25rem 0.45rem;
+    padding: 0.32rem 0.45rem;
+  }
+
+  .maplibregl-ctrl-bottom-left {
+    margin: 0 0 0.55rem 0.55rem !important;
+  }
+
+  .card {
+    max-height: min(58%, 26rem);
+  }
+
+  .stage:has(.card) .map-legend-dock {
+    --map-card-lift: min(58%, 26rem);
+  }
+
+  .stage:has(.card) .maplibregl-ctrl-bottom-left {
+    bottom: min(58%, 26rem) !important;
   }
 }
 

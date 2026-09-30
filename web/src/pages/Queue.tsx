@@ -328,7 +328,10 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
               Satellite
             </button>
           </div>
-          <div className="legend" aria-label="Legend">
+        </div>
+        <div className={`map-legend-dock${selected ? ' is-drawer-open' : ''}`} aria-label="Legend">
+          <div className="map-legend-gutter" aria-hidden="true" />
+          <div className="legend">
             {LABEL_ORDER.map((l) => (
               <span key={l}>
                 <i className={`dot dot-${l}`} aria-hidden="true" />

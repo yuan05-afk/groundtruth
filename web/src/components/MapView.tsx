@@ -522,9 +522,11 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
       sel.setData({ type: 'FeatureCollection', features })
 
       const container = map.getContainer()
-      const right = drawerOpen ? Math.min(500, container.clientWidth * 0.5) : 60
+      const narrow = container.clientWidth <= 980
+      const right = drawerOpen && !narrow ? Math.min(500, container.clientWidth * 0.5) : 60
+      const bottom = drawerOpen && narrow ? Math.min(container.clientHeight * 0.55, 448) + 28 : 72
       map.fitBounds(bounds as LngLatBoundsLike, {
-        padding: { top: 72, bottom: 72, left: 56, right: right + 36 },
+        padding: { top: 72, bottom, left: 56, right: right + 36 },
         maxZoom: 14.5,
         duration: 650,
         essential: true,
