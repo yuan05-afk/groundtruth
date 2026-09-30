@@ -494,6 +494,24 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
   useEffect(() => {
     const map = mapRef.current
     if (!map) return
+    ready.current?.then(() => {
+      if (!map.getLayer('pts')) return
+      const dim = !!selected
+      map.setPaintProperty(
+        'pts',
+        'circle-opacity',
+        dim ? 0.18 : ['match', ['get', 'L'], 'low', 0.45, 'insufficient', 0.65, 0.9],
+      )
+      map.setPaintProperty('clusters', 'circle-opacity', dim ? 0.2 : 0.88)
+      if (map.getLayer('cluster-count')) {
+        map.setPaintProperty('cluster-count', 'text-opacity', dim ? 0.25 : 1)
+      }
+    })
+  }, [selected])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
     let cancelled = false
     ready.current?.then(async () => {
       const sel = map.getSource('sel') as GeoJSONSource
