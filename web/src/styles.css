@@ -1179,7 +1179,8 @@ h3 {
 .map-legend-dock {
   --map-chrome-left: 0.85rem;
   --map-chrome-bottom: 0.85rem;
-  --map-nav-gutter: 2.35rem;
+  /* Match MapLibre zoom + scale stack width so the legend sits clear to the right. */
+  --map-nav-gutter: 5.75rem;
   --map-drawer-reserve: 0px;
   --map-card-lift: 0px;
   position: absolute;
@@ -1196,7 +1197,7 @@ h3 {
 .map-legend-gutter {
   flex: 0 0 var(--map-nav-gutter);
   width: var(--map-nav-gutter);
-  height: 4.6rem;
+  height: 5.5rem;
 }
 
 .stage:has(.card) .map-legend-dock {
@@ -2037,11 +2038,11 @@ h3 {
   .map-legend-dock {
     --map-chrome-left: 0.55rem;
     --map-chrome-bottom: 0.55rem;
-    --map-nav-gutter: 2.15rem;
+    --map-nav-gutter: 5.25rem;
   }
 
   .map-legend-gutter {
-    height: 4.25rem;
+    height: 5.1rem;
   }
 
   .legend {
