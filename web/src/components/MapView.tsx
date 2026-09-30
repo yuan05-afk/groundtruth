@@ -36,6 +36,11 @@ type Props = {
 
 const EMPTY: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] }
 
+const PH_BOUNDS: LngLatBoundsLike = [
+  [116.8, 4.4],
+  [127.1, 21.3],
+]
+
 function centroidOf(f: MuniFeature): [number, number] {
   const rings = f.geometry.type === 'Polygon' ? f.geometry.coordinates : f.geometry.coordinates.flat()
   let best = rings[0]
@@ -62,10 +67,10 @@ function bboxOf(f: MuniFeature): [number, number, number, number] {
   return [a, b, c, d]
 }
 
+/** Raster basemap only. Satellite is added on first use so Map mode stays light. */
 const BASE_STYLE: StyleSpecification = {
   version: 8,
   name: 'GroundTruth greyscale',
-  // Demote font dependency: labels still work if this host is slow; basemap is raster.
   glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
   sources: {
     basemap: {
@@ -85,21 +90,30 @@ const BASE_STYLE: StyleSpecification = {
       tileSize: 256,
       maxzoom: 16,
     },
-    satellite: {
-      type: 'raster',
-      tiles: [
-        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      ],
-      tileSize: 256,
-      maxzoom: 19,
-      attribution: 'Imagery (c) Esri, Maxar, Earthstar Geographics',
-    },
   },
   layers: [
     { id: 'basemap', type: 'raster', source: 'basemap' },
-    { id: 'basemap-labels', type: 'raster', source: 'basemapLabels' },
-    { id: 'satellite', type: 'raster', source: 'satellite', layout: { visibility: 'none' } },
+    { id: 'basemap-labels', type: 'raster', source: 'basemapLabels', minzoom: 5 },
   ],
+}
+
+function ensureSatellite(map: MapLibreMapType) {
+  if (map.getSource('satellite')) return
+  map.addSource('satellite', {
+    type: 'raster',
+    tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+    tileSize: 256,
+    maxzoom: 19,
+    attribution: 'Imagery (c) Esri, Maxar, Earthstar Geographics',
+  })
+  const before = map.getLayer('muni-actual-fill')
+    ? 'muni-actual-fill'
+    : map.getLayer('clusters')
+      ? 'clusters'
+      : map.getLayer('pts')
+        ? 'pts'
+        : undefined
+  map.addLayer({ id: 'satellite', type: 'raster', source: 'satellite', layout: { visibility: 'none' } }, before)
 }
 
 export function MapView({ points, selected, related, basemap, onSelect, drawerOpen }: Props) {
@@ -107,8 +121,16 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
   const mapRef = useRef<MapLibreMapType | null>(null)
   const ready = useRef<Promise<void> | null>(null)
   const munisRef = useRef<Map<number, MuniFeature> | null>(null)
+  const titleByIndex = useRef<Map<number, string>>(new Map())
   const onSelectRef = useRef(onSelect)
+  const pointsSig = useRef('')
   onSelectRef.current = onSelect
+
+  useEffect(() => {
+    const next = new Map<number, string>()
+    for (const p of points) next.set(p.i, p.t)
+    titleByIndex.current = next
+  }, [points])
 
   useEffect(() => {
     if (!ref.current) return
@@ -122,51 +144,91 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
       attributionControl: { compact: true },
       dragRotate: false,
       pitchWithRotate: false,
+      fadeDuration: 0,
+      crossSourceCollisions: false,
+      maxTileCacheSize: 250,
+      refreshExpiredTiles: false,
+      collectResourceTiming: false,
     })
     map.touchZoomRotate.disableRotation()
-    map.addControl(new NavigationControl({ showCompass: false }), 'bottom-left')
-    map.addControl(new ScaleControl({ unit: 'metric' }), 'bottom-left')
+    map.addControl(new NavigationControl({ showCompass: false, visualizePitch: false }), 'bottom-left')
+    map.addControl(new ScaleControl({ unit: 'metric', maxWidth: 100 }), 'bottom-left')
     mapRef.current = map
 
     ready.current = new Promise((resolve) => {
       map.on('load', () => {
         map.resize()
+        map.fitBounds(PH_BOUNDS, { padding: 28, duration: 0 })
 
         map.addSource('munis', { type: 'geojson', data: EMPTY })
         map.addLayer({
           id: 'muni-actual-fill',
           type: 'fill',
           source: 'munis',
-          filter: ['in', ['get', 'mid'], ['literal', []]],
+          filter: ['==', ['get', 'role'], 'actual'],
           paint: { 'fill-color': '#0a0a0a', 'fill-opacity': 0.06 },
         })
         map.addLayer({
           id: 'muni-actual-line',
           type: 'line',
           source: 'munis',
-          filter: ['in', ['get', 'mid'], ['literal', []]],
+          filter: ['==', ['get', 'role'], 'actual'],
           paint: { 'line-color': '#0a0a0a', 'line-width': 1.2, 'line-opacity': 0.7 },
         })
         map.addLayer({
           id: 'muni-claimed-fill',
           type: 'fill',
           source: 'munis',
-          filter: ['in', ['get', 'mid'], ['literal', []]],
+          filter: ['==', ['get', 'role'], 'claimed'],
           paint: { 'fill-color': '#0a0a0a', 'fill-opacity': 0.04 },
         })
         map.addLayer({
           id: 'muni-claimed-line',
           type: 'line',
           source: 'munis',
-          filter: ['in', ['get', 'mid'], ['literal', []]],
+          filter: ['==', ['get', 'role'], 'claimed'],
           paint: { 'line-color': '#0a0a0a', 'line-width': 1.6, 'line-dasharray': [2, 1.5] },
         })
 
-        map.addSource('pts', { type: 'geojson', data: EMPTY })
+        map.addSource('pts', {
+          type: 'geojson',
+          data: EMPTY,
+          cluster: true,
+          clusterMaxZoom: 11,
+          clusterRadius: 44,
+          clusterMinPoints: 3,
+        })
+        map.addLayer({
+          id: 'clusters',
+          type: 'circle',
+          source: 'pts',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': '#0a0a0a',
+            'circle-radius': ['step', ['get', 'point_count'], 11, 20, 15, 80, 20, 200, 26],
+            'circle-opacity': 0.88,
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': 1.2,
+          },
+        })
+        map.addLayer({
+          id: 'cluster-count',
+          type: 'symbol',
+          source: 'pts',
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': ['get', 'point_count_abbreviated'],
+            'text-font': ['Noto Sans Regular'],
+            'text-size': 11,
+            'text-allow-overlap': true,
+          },
+          paint: { 'text-color': '#ffffff' },
+        })
         map.addLayer({
           id: 'pts',
           type: 'circle',
           source: 'pts',
+          filter: ['!', ['has', 'point_count']],
           layout: {
             'circle-sort-key': ['match', ['get', 'L'], 'records', 3, 'field', 2, 'insufficient', 1, 0],
           },
@@ -187,15 +249,15 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
               ['linear'],
               ['zoom'],
               4,
-              ['match', ['get', 'L'], 'records', 2.6, 'field', 2.3, 1.5],
+              ['match', ['get', 'L'], 'records', 2.4, 'field', 2.1, 1.4],
               9,
-              ['match', ['get', 'L'], 'records', 5, 'field', 4.5, 3],
+              ['match', ['get', 'L'], 'records', 4.5, 'field', 4, 2.8],
               14,
-              ['match', ['get', 'L'], 'records', 8, 'field', 7, 5],
+              ['match', ['get', 'L'], 'records', 7.5, 'field', 6.5, 4.5],
             ],
-            'circle-opacity': ['match', ['get', 'L'], 'low', 0.5, 'insufficient', 0.7, 0.92],
+            'circle-opacity': ['match', ['get', 'L'], 'low', 0.45, 'insufficient', 0.65, 0.9],
             'circle-stroke-color': '#ffffff',
-            'circle-stroke-width': ['match', ['get', 'L'], 'low', 0, 0.8],
+            'circle-stroke-width': ['step', ['zoom'], 0, 8, ['match', ['get', 'L'], 'low', 0, 0.8]],
           },
         })
 
@@ -273,13 +335,14 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           map.getCanvas().style.cursor = 'pointer'
           const f = e.features?.[0]
           if (!f) return
-          const props = f.properties as { t: string; L: keyof typeof LABELS }
+          const props = f.properties as { i: number; L: keyof typeof LABELS }
+          const title = titleByIndex.current.get(Number(props.i)) ?? ''
           popup
             .setLngLat((f.geometry as GeoJSON.Point).coordinates as [number, number])
             .setHTML(`<div class="gt-popup-label l-${props.L}">${LABELS[props.L].name}</div><div class="gt-popup-title"></div>`)
             .addTo(map)
           const el = popup.getElement()?.querySelector('.gt-popup-title')
-          if (el) el.textContent = props.t
+          if (el) el.textContent = title
         })
         map.on('mouseleave', 'pts', () => {
           map.getCanvas().style.cursor = ''
@@ -289,6 +352,27 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           const f = e.features?.[0]
           if (f) onSelectRef.current(Number(f.properties?.i))
         })
+        map.on('mouseenter', 'clusters', () => {
+          map.getCanvas().style.cursor = 'pointer'
+        })
+        map.on('mouseleave', 'clusters', () => {
+          map.getCanvas().style.cursor = ''
+        })
+        map.on('click', 'clusters', (e: MapLayerMouseEvent) => {
+          const f = e.features?.[0]
+          if (!f || f.geometry.type !== 'Point') return
+          const clusterId = f.properties?.cluster_id as number | undefined
+          if (clusterId === undefined) return
+          const coords = f.geometry.coordinates as [number, number]
+          const src = map.getSource('pts') as GeoJSONSource
+          src.getClusterExpansionZoom(clusterId).then((zoom) => {
+            map.easeTo({
+              center: coords,
+              zoom,
+              duration: 450,
+            })
+          })
+        })
         resolve()
         requestAnimationFrame(() => map.resize())
       })
@@ -297,30 +381,59 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
       })
     })
 
-    const ro = new ResizeObserver(() => map.resize())
+    let resizeRaf = 0
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(resizeRaf)
+      resizeRaf = requestAnimationFrame(() => map.resize())
+    })
     ro.observe(ref.current)
 
     return () => {
+      cancelAnimationFrame(resizeRaf)
       ro.disconnect()
       map.remove()
       mapRef.current = null
+      ready.current = null
     }
   }, [])
 
   useEffect(() => {
     const map = mapRef.current
+    let cancelled = false
+    let raf = 0
     ready.current?.then(() => {
-      if (!map) return
-      const fc: GeoJSON.FeatureCollection = {
-        type: 'FeatureCollection',
-        features: points.map((p) => ({
-          type: 'Feature',
-          geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
-          properties: { i: p.i, L: p.L, t: p.t },
-        })),
+      if (!map || cancelled) return
+      let hash = points.length * 2654435761
+      for (let i = 0; i < points.length; i += Math.max(1, (points.length / 64) | 0)) {
+        const p = points[i]
+        hash = (hash ^ ((p.i * 33 + p.L.charCodeAt(0)) | 0)) | 0
       }
-      ;(map.getSource('pts') as GeoJSONSource).setData(fc)
+      if (points.length) {
+        const last = points[points.length - 1]
+        hash = (hash ^ ((last.i * 33 + last.L.charCodeAt(0)) | 0)) | 0
+      }
+      const sig = `${points.length}:${hash}`
+      if (sig === pointsSig.current) return
+      pointsSig.current = sig
+
+      raf = requestAnimationFrame(() => {
+        if (cancelled || !map.getSource('pts')) return
+        const features = new Array(points.length)
+        for (let i = 0; i < points.length; i++) {
+          const p = points[i]
+          features[i] = {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
+            properties: { i: p.i, L: p.L },
+          }
+        }
+        ;(map.getSource('pts') as GeoJSONSource).setData({ type: 'FeatureCollection', features })
+      })
     })
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(raf)
+    }
   }, [points])
 
   useEffect(() => {
@@ -328,6 +441,7 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
     ready.current?.then(() => {
       if (!map) return
       const sat = basemap === 'satellite'
+      if (sat) ensureSatellite(map)
       if (map.getLayer('satellite')) map.setLayoutProperty('satellite', 'visibility', sat ? 'visible' : 'none')
       if (map.getLayer('basemap')) map.setLayoutProperty('basemap', 'visibility', sat ? 'none' : 'visible')
       if (map.getLayer('basemap-labels')) map.setLayoutProperty('basemap-labels', 'visibility', sat ? 'none' : 'visible')
@@ -340,15 +454,15 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
     let cancelled = false
     ready.current?.then(async () => {
       const sel = map.getSource('sel') as GeoJSONSource
+      const munisSrc = map.getSource('munis') as GeoJSONSource
       if (!selected) {
         sel.setData(EMPTY)
-        for (const id of ['muni-actual-fill', 'muni-actual-line', 'muni-claimed-fill', 'muni-claimed-line'])
-          map.setFilter(id, ['in', ['get', 'mid'], ['literal', []]])
+        munisSrc.setData(EMPTY)
         return
       }
       if (!munisRef.current) {
         const fc = await loadMunicipalities()
-        ;(map.getSource('munis') as GeoJSONSource).setData(fc)
+        if (cancelled) return
         munisRef.current = new Map(fc.features.map((f: MuniFeature) => [f.properties.mid, f]))
       }
       if (cancelled) return
@@ -356,10 +470,18 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
       const p = selected
       const claimed = [...new Set([p.fm, p.tm].filter((m): m is number => m !== null))]
       const actual = p.am !== null && !claimed.includes(p.am) ? [p.am] : []
-      map.setFilter('muni-claimed-fill', ['in', ['get', 'mid'], ['literal', claimed]])
-      map.setFilter('muni-claimed-line', ['in', ['get', 'mid'], ['literal', claimed]])
-      map.setFilter('muni-actual-fill', ['in', ['get', 'mid'], ['literal', actual]])
-      map.setFilter('muni-actual-line', ['in', ['get', 'mid'], ['literal', actual]])
+
+      // Only push the few polygons we need - never the full 2.7MB nation set.
+      const muniFeatures: GeoJSON.Feature[] = []
+      for (const m of claimed) {
+        const f = munis.get(m)
+        if (f) muniFeatures.push({ ...f, properties: { ...f.properties, role: 'claimed' } })
+      }
+      for (const m of actual) {
+        const f = munis.get(m)
+        if (f) muniFeatures.push({ ...f, properties: { ...f.properties, role: 'actual' } })
+      }
+      munisSrc.setData({ type: 'FeatureCollection', features: muniFeatures })
 
       const pin: [number, number] = [p.lon, p.lat]
       const features: GeoJSON.Feature[] = [{ type: 'Feature', geometry: { type: 'Point', coordinates: pin }, properties: { kind: 'pin' } }]
@@ -402,9 +524,9 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
       const container = map.getContainer()
       const right = drawerOpen ? Math.min(500, container.clientWidth * 0.5) : 60
       map.fitBounds(bounds as LngLatBoundsLike, {
-        padding: { top: 80, bottom: 80, left: 60, right: right + 40 },
+        padding: { top: 72, bottom: 72, left: 56, right: right + 36 },
         maxZoom: 14.5,
-        duration: 1400,
+        duration: 650,
         essential: true,
       })
     })

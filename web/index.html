@@ -10,6 +10,11 @@
       content="GroundTruth checks published Philippine flood control contracts against geography and the rest of the record, then ranks an inspection queue with explainable evidence cards."
     />
     <title>GroundTruth</title>
+    <link rel="preload" href="/data/summary.json" as="fetch" crossorigin />
+    <link rel="preload" href="/data/projects.json" as="fetch" crossorigin />
+    <link rel="preload" href="/maplibre-worker.mjs" as="script" crossorigin />
+    <link rel="dns-prefetch" href="https://server.arcgisonline.com" />
+    <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin />
   </head>
   <body>
     <div id="root"></div>

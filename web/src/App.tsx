@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { OpeningIntro } from './components/OpeningIntro'
 import { TopBar } from './components/TopBar'
+import { loadProjects, loadSummary } from './lib/data'
 import { useRoute } from './lib/router'
 import { Brief } from './pages/Brief'
 import { Method } from './pages/Method'
@@ -9,9 +10,21 @@ import { Queue } from './pages/Queue'
 
 const pageEase = [0.22, 1, 0.36, 1] as const
 
+function prefetchQueueAssets() {
+  void loadSummary()
+  void loadProjects()
+  const base = import.meta.env.BASE_URL
+  void fetch(`${base}maplibre-worker.mjs`).catch(() => {})
+  void fetch(`${base}maplibre-gl-shared.mjs`).catch(() => {})
+}
+
 export default function App() {
   const route = useRoute()
   const [introDone, setIntroDone] = useState(false)
+
+  useEffect(() => {
+    prefetchQueueAssets()
+  }, [])
 
   useEffect(() => {
     if (route.page !== 'queue') window.scrollTo({ top: 0, behavior: 'smooth' })
