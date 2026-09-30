@@ -275,7 +275,7 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
         })
         // Claimed-town mark (dashed ring + hollow core) — pairs with the recorded pin, like the Brief locator.
         if (!map.hasImage('claimed-mark')) {
-          map.addImage('claimed-mark', makeClaimedMarkImage())
+          map.addImage('claimed-mark', makeClaimedMarkImage(), { pixelRatio: 2 })
         }
         map.addLayer({
           id: 'sel-claimed',
@@ -284,11 +284,25 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           filter: ['==', ['get', 'kind'], 'claimed'],
           layout: {
             'icon-image': 'claimed-mark',
-            'icon-size': 0.55,
+            'icon-size': 1,
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
           },
         })
+        // Fallback ring under the icon so a claimed mark is never invisible if the sprite fails.
+        map.addLayer({
+          id: 'sel-claimed-fallback',
+          type: 'circle',
+          source: 'sel',
+          filter: ['==', ['get', 'kind'], 'claimed'],
+          paint: {
+            'circle-radius': 13,
+            'circle-color': 'rgba(255,255,255,0.55)',
+            'circle-stroke-color': '#0a0a0a',
+            'circle-stroke-width': 1.5,
+            'circle-stroke-opacity': 0.35,
+          },
+        }, 'sel-claimed')
         map.addLayer({
           id: 'sel-related',
           type: 'circle',
@@ -501,7 +515,7 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
       if (cancelled) return
       const munis = munisRef.current
       const p = selected
-      const claimed = [...new Set([p.fm, p.tm].filter((m): m is number => m !== null))]
+      const claimed = [...new Set([p.sm, p.fm, p.tm].filter((m): m is number => m !== null))]
       const actual = p.am !== null && !claimed.includes(p.am) ? [p.am] : []
 
       // Only push the few polygons we need - never the full 2.7MB nation set.
@@ -598,18 +612,14 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
 }
 
 /** Dashed ring + hollow core — matches the Brief locator "claimed town" mark. */
-function makeClaimedMarkImage(): {
-  width: number
-  height: number
-  data: Uint8Array
-} {
+function makeClaimedMarkImage(): ImageData {
   const size = 64
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
   const ctx = canvas.getContext('2d')
   if (!ctx) {
-    return { width: size, height: size, data: new Uint8Array(size * size * 4) }
+    return new ImageData(size, size)
   }
   ctx.clearRect(0, 0, size, size)
   ctx.strokeStyle = '#0a0a0a'
@@ -625,8 +635,7 @@ function makeClaimedMarkImage(): {
   ctx.arc(size / 2, size / 2, 4.5, 0, Math.PI * 2)
   ctx.fill()
   ctx.stroke()
-  const imageData = ctx.getImageData(0, 0, size, size)
-  return { width: size, height: size, data: new Uint8Array(imageData.data.buffer) }
+  return ctx.getImageData(0, 0, size, size)
 }
 
 function haversineKm(a: [number, number], b: [number, number]) {
