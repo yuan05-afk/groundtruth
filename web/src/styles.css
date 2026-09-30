@@ -1459,11 +1459,11 @@ h3 {
 
 .next-step {
   margin: 0;
-  padding: 0.7rem 0.8rem;
-  background: var(--paper-2);
-  border-left: 2px solid var(--ink);
-  font-size: 0.86rem;
-  color: var(--ink-2);
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--ink);
 }
 
 .claims,
@@ -1515,21 +1515,19 @@ h3 {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.6rem;
+  gap: 0.75rem;
 }
 
 .signal {
-  padding: 0.6rem 0.65rem;
-  border: 1px solid var(--line);
-  border-left: 2px solid var(--ink);
-  background: var(--paper);
+  padding: 0 0 0.75rem;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
 }
 
-.signal-location {
-  border-left-style: solid;
-}
-.signal-risk {
-  border-left-style: dashed;
+.signal:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
 .signal-head {
