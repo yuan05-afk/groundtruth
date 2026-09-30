@@ -14,10 +14,10 @@ import { useEffect, useRef } from 'react'
 import { type MuniFeature, type Project, LABELS, fmtKm, loadMunicipalities } from '../lib/data'
 
 export const LABEL_COLORS = {
-  records: '#b3402a',
-  field: '#2d4a8a',
-  low: '#9c9686',
-  insufficient: '#c9c1ae',
+  records: '#0a0a0a',
+  field: '#4a4a4a',
+  low: '#b0b0b0',
+  insufficient: '#d8d8d8',
 }
 
 type Props = {
@@ -68,14 +68,14 @@ function restyle(map: MapLibreMapType) {
       )
     }
   }
-  set('background', 'background-color', '#efebe1')
-  set('water', 'fill-color', '#d3dcdd')
-  set('park', 'fill-color', '#e6e4d6')
-  set('landcover_wood', 'fill-color', '#e7e5d8')
-  set('landuse_residential', 'fill-color', '#ebe6db')
-  set('waterway', 'line-color', '#a7bcc2')
-  set('building', 'fill-color', '#e2ddd0')
-  for (const id of ['boundary_2', 'boundary_3']) set(id, 'line-color', '#b9b1a0')
+  set('background', 'background-color', '#f5f5f5')
+  set('water', 'fill-color', '#e0e0e0')
+  set('park', 'fill-color', '#eeeeee')
+  set('landcover_wood', 'fill-color', '#ececec')
+  set('landuse_residential', 'fill-color', '#f2f2f2')
+  set('waterway', 'line-color', '#b5b5b5')
+  set('building', 'fill-color', '#e8e8e8')
+  for (const id of ['boundary_2', 'boundary_3']) set(id, 'line-color', '#c0c0c0')
 }
 
 export function MapView({ points, selected, related, basemap, onSelect, drawerOpen }: Props) {
@@ -122,28 +122,28 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           type: 'fill',
           source: 'munis',
           filter: ['in', ['get', 'mid'], ['literal', []]],
-          paint: { 'fill-color': '#1b1a16', 'fill-opacity': 0.05 },
+          paint: { 'fill-color': '#0a0a0a', 'fill-opacity': 0.06 },
         })
         map.addLayer({
           id: 'muni-actual-line',
           type: 'line',
           source: 'munis',
           filter: ['in', ['get', 'mid'], ['literal', []]],
-          paint: { 'line-color': '#1b1a16', 'line-width': 1, 'line-opacity': 0.55 },
+          paint: { 'line-color': '#0a0a0a', 'line-width': 1.2, 'line-opacity': 0.7 },
         })
         map.addLayer({
           id: 'muni-claimed-fill',
           type: 'fill',
           source: 'munis',
           filter: ['in', ['get', 'mid'], ['literal', []]],
-          paint: { 'fill-color': '#b3402a', 'fill-opacity': 0.07 },
+          paint: { 'fill-color': '#0a0a0a', 'fill-opacity': 0.04 },
         })
         map.addLayer({
           id: 'muni-claimed-line',
           type: 'line',
           source: 'munis',
           filter: ['in', ['get', 'mid'], ['literal', []]],
-          paint: { 'line-color': '#b3402a', 'line-width': 1.6, 'line-dasharray': [2, 1.5] },
+          paint: { 'line-color': '#0a0a0a', 'line-width': 1.6, 'line-dasharray': [2, 1.5] },
         })
 
         map.addSource('pts', { type: 'geojson', data: EMPTY })
@@ -178,8 +178,8 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
               ['match', ['get', 'L'], 'records', 8, 'field', 7, 5],
             ],
             'circle-opacity': ['match', ['get', 'L'], 'low', 0.5, 'insufficient', 0.7, 0.92],
-            'circle-stroke-color': '#f6f3ec',
-            'circle-stroke-width': ['match', ['get', 'L'], 'low', 0, 0.6],
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': ['match', ['get', 'L'], 'low', 0, 0.8],
           },
         })
 
@@ -190,7 +190,7 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           source: 'sel',
           filter: ['==', ['get', 'kind'], 'line'],
           paint: {
-            'line-color': ['match', ['get', 'role'], 'water', '#2b6f8f', '#b3402a'],
+            'line-color': '#0a0a0a',
             'line-width': 1.6,
             'line-dasharray': [1.5, 1.5],
           },
@@ -203,7 +203,7 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           paint: {
             'circle-radius': 7,
             'circle-color': 'rgba(0,0,0,0)',
-            'circle-stroke-color': '#1b1a16',
+            'circle-stroke-color': '#0a0a0a',
             'circle-stroke-width': 1.2,
           },
         })
@@ -212,7 +212,7 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           type: 'circle',
           source: 'sel',
           filter: ['==', ['get', 'kind'], 'water'],
-          paint: { 'circle-radius': 4, 'circle-color': '#2b6f8f', 'circle-stroke-color': '#f6f3ec', 'circle-stroke-width': 1.5 },
+          paint: { 'circle-radius': 4, 'circle-color': '#555555', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.5 },
         })
         map.addLayer({
           id: 'sel-ring',
@@ -222,7 +222,7 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           paint: {
             'circle-radius': 15,
             'circle-color': 'rgba(0,0,0,0)',
-            'circle-stroke-color': '#1b1a16',
+            'circle-stroke-color': '#0a0a0a',
             'circle-stroke-width': 1.4,
           },
         })
@@ -231,7 +231,7 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           type: 'circle',
           source: 'sel',
           filter: ['==', ['get', 'kind'], 'pin'],
-          paint: { 'circle-radius': 5.5, 'circle-color': '#1b1a16', 'circle-stroke-color': '#f6f3ec', 'circle-stroke-width': 2 },
+          paint: { 'circle-radius': 5.5, 'circle-color': '#0a0a0a', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 },
         })
         map.addLayer({
           id: 'sel-labels',
@@ -246,8 +246,8 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
             'text-allow-overlap': true,
           },
           paint: {
-            'text-color': ['match', ['get', 'role'], 'water', '#1f5670', '#8f3120'],
-            'text-halo-color': '#f6f3ec',
+            'text-color': '#0a0a0a',
+            'text-halo-color': '#ffffff',
             'text-halo-width': 2,
           },
         })

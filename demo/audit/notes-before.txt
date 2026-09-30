@@ -1,0 +1,6 @@
+01-brief-before: https://groundtruth-ph.vercel.app/
+hero locator/placeholder count: 5
+02-queue-before: https://groundtruth-ph.vercel.app/#/queue
+queue rows: 14
+evidence card opened
+04-method-before: https://groundtruth-ph.vercel.app/#/method

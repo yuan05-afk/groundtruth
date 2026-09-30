@@ -33,7 +33,10 @@ Investigative journalists, watchdog researchers, and government validators who n
 Pipeline (Python) + editorial React/MapLibre web app + ranked queue + evidence cards + Method page + capacity slider + CSV export. All product code for this submission was created for LovHack Season 3. Public datasets and open-source libraries are credited on the Method page.
 
 ### Technologies
-Python, pandas, geopandas, shapely, rapidfuzz, pyosmium, Vite, React, TypeScript, MapLibre GL, OpenFreeMap, geoBoundaries, OpenStreetMap, Vercel.
+Python, pandas, geopandas, shapely, rapidfuzz, pyosmium, Vite, React, TypeScript, MapLibre GL, Motion, OpenFreeMap, geoBoundaries, OpenStreetMap, Vercel.
+
+### Brand
+Museum white + ink black. Syne wordmark with survey-crosshair mark; Source Serif 4 headlines; DM Sans UI; IBM Plex Mono for IDs and scores. Greyscale MapLibre. No cream paper, terracotta accents, or stock flood photography—the hero is a working evidence Locator diagram.
 
 ### Ethics
 Neutral language only. No contractor rankings. Every flag shows an innocent explanation. The tool cannot prove a structure exists or does not—only a site visit can.
@@ -42,4 +45,4 @@ Neutral language only. No contractor rankings. Every flag shows an innocent expl
 - Execution 35%: live demo, 9,855 records, no backend to fail
 - Problem & Impact 25%: current national story, real bottleneck
 - Innovation 20%: two-claim location resolution + inspection-capacity slider + triage labels (not another dashboard)
-- Presentation 20%: editorial UI, Method page, demo video (to regenerate)
+- Presentation 20%: B&W brand system, Method page, demo video (to regenerate)

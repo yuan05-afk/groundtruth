@@ -1,0 +1,14 @@
+11-brief-after: https://groundtruth-ph.vercel.app/
+wordmark: GroundTruth
+locators: 4, land paths: 3, pins: 4
+tokens paper=#fff ink=#0a0a0a
+12-queue-after: https://groundtruth-ph.vercel.app/#/queue
+queue rows: 15
+filter toggle: 1
+evidence cards: 1
+map canvases: 1
+14-method-after: https://groundtruth-ph.vercel.app/#/method
+method tables: 3
+favicon href: /favicon.svg
+
+PASS

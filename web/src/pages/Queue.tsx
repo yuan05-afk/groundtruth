@@ -66,6 +66,7 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
   const [sort, setSort] = useState<SortKey>('priority')
   const [basemap, setBasemap] = useState<'map' | 'satellite'>('map')
   const [capacity, setCapacity] = useState(0)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const deferredQuery = useDeferredValue(query)
 
   useEffect(() => {
@@ -153,8 +154,6 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
     { key: 'flagged', text: 'Flagged' },
     { key: 'records', text: LABELS.records.short },
     { key: 'field', text: LABELS.field.short },
-    { key: 'low', text: LABELS.low.short },
-    { key: 'insufficient', text: LABELS.insufficient.short },
     { key: 'all', text: 'All' },
   ]
 
@@ -192,31 +191,42 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search"
             />
-            <div className="filter-row">
-              <select value={region} onChange={(e) => setRegion(e.target.value)} aria-label="Region">
-                <option value="">All regions</option>
-                {summary?.regions.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-              <select value={year} onChange={(e) => setYear(e.target.value)} aria-label="Funding year">
-                <option value="">All years</option>
-                {summary?.funding_years.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
-              <select value={signal} onChange={(e) => setSignal(e.target.value as SignalCode | '')} aria-label="Signal">
-                <option value="">Any signal</option>
-                {signalOptions.map((c) => (
-                  <option key={c} value={c}>
-                    {SIGNALS[c].name} ({fmtInt(summary!.signals[c])})
-                  </option>
-                ))}
-              </select>
+            <button
+              type="button"
+              className="filter-toggle"
+              aria-expanded={filtersOpen}
+              onClick={() => setFiltersOpen((v) => !v)}
+            >
+              {filtersOpen ? 'Hide filters' : 'More filters'}
+              {(region || year || signal) && <span className="mono"> · on</span>}
+            </button>
+            <div className={filtersOpen ? 'filter-drawer open' : 'filter-drawer'}>
+              <div className="filter-row">
+                <select value={region} onChange={(e) => setRegion(e.target.value)} aria-label="Region">
+                  <option value="">All regions</option>
+                  {summary?.regions.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                </select>
+                <select value={year} onChange={(e) => setYear(e.target.value)} aria-label="Funding year">
+                  <option value="">All years</option>
+                  {summary?.funding_years.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+                <select value={signal} onChange={(e) => setSignal(e.target.value as SignalCode | '')} aria-label="Signal">
+                  <option value="">Any signal</option>
+                  {signalOptions.map((c) => (
+                    <option key={c} value={c}>
+                      {SIGNALS[c].name} ({fmtInt(summary!.signals[c])})
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
           <div className="list-meta">
@@ -238,26 +248,6 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
               </button>
             </span>
           </div>
-          <div className="capacity">
-            <div className="capacity-head">
-              <span>If you can inspect only</span>
-              <strong className="mono">{capacity === 0 ? 'all flagged' : `${capacity} contracts`}</strong>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={5}
-              value={capacity}
-              onChange={(e) => setCapacity(Number(e.target.value))}
-              aria-label="Inspector capacity"
-            />
-            <p className="capacity-note">
-              {capacity === 0
-                ? 'Show the full filtered queue. Drag right to keep only the top N by current sort.'
-                : `Map and list show the top ${capacity} under the current filters. Export matches what you see.`}
-            </p>
-          </div>
         </div>
 
         <div className="list" ref={listRef}>
@@ -266,7 +256,7 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
           <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
             {virtualizer.getVirtualItems().map((v) => {
               const p = filtered[v.index]
-              const top = [...p.sig].sort((a, b) => b.strength - a.strength).slice(0, 2)
+              const top = [...p.sig].sort((a, b) => b.strength - a.strength).slice(0, 1)
               return (
                 <button
                   key={p.i}
@@ -284,12 +274,10 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
                     </span>
                     {top.length > 0 && (
                       <span className="row-signals">
-                        {top.map((s) => (
-                          <span key={s.code} className={`tag tag-${s.group}`}>
-                            {SIGNALS[s.code]?.name ?? s.code}
-                          </span>
-                        ))}
-                        {p.sig.length > 2 && <span className="tag tag-more">+{p.sig.length - 2}</span>}
+                        <span className={`tag tag-${top[0].group}`}>
+                          {SIGNALS[top[0].code]?.name ?? top[0].code}
+                        </span>
+                        {p.sig.length > 1 && <span className="tag tag-more">+{p.sig.length - 1}</span>}
                       </span>
                     )}
                   </span>
@@ -300,6 +288,19 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
               )
             })}
           </div>
+        </div>
+        <div className="capacity-inline">
+          <span>Inspect only</span>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={capacity}
+            onChange={(e) => setCapacity(Number(e.target.value))}
+            aria-label="Inspector capacity"
+          />
+          <strong>{capacity === 0 ? 'all' : capacity}</strong>
         </div>
       </section>
 

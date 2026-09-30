@@ -1,3 +1,4 @@
+import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { AmountHistogram } from '../components/AmountHistogram'
 import { Locator } from '../components/Locator'
@@ -64,6 +65,11 @@ const CASE_COPY: Record<string, (f: Featured) => { fig: string; body: string }> 
   },
 }
 
+const fadeUp = {
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0 },
+}
+
 export function Brief() {
   const [summary, setSummary] = useState<Summary | null>(null)
   const [featured, setFeatured] = useState<Featured[]>([])
@@ -81,30 +87,45 @@ export function Brief() {
   return (
     <main className="brief">
       <section className="hero">
-        <div className="hero-text">
-          <p className="eyebrow">Philippine flood control, {summary ? fmtInt(summary.records) : '9,855'} public contracts</p>
-          <h1>
+        <motion.div
+          className="hero-text"
+          initial="initial"
+          animate="animate"
+          transition={{ staggerChildren: 0.08, delayChildren: 0.05 }}
+        >
+          <motion.p className="hero-brand" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+            GroundTruth
+          </motion.p>
+          <motion.p className="eyebrow" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+            Philippine flood control · {summary ? fmtInt(summary.records) : '9,855'} public contracts
+          </motion.p>
+          <motion.h1 variants={fadeUp} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
             The record says a flood wall was built here.
             <em> So we checked where “here” is.</em>
-          </h1>
-          <p className="lede">
-            GroundTruth reads every published DPWH flood control contract, checks its pin against municipal
-            boundaries, rivers and the rest of the record, and sorts it into one of four piles:
-            fix the record, visit the site, leave it for now, or cannot tell.
-          </p>
-          <div className="hero-actions">
+          </motion.h1>
+          <motion.p className="lede" variants={fadeUp} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
+            Every published DPWH flood control contract is checked against municipal boundaries, rivers, and the rest of
+            the record—then sorted into four piles: fix the record, visit the site, leave it for now, or cannot tell.
+          </motion.p>
+          <motion.div className="hero-actions" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
             <a className="btn btn-primary" href="#/queue">
               Open the inspection queue
             </a>
             <a className="btn btn-quiet" href="#/method">
               How it decides
             </a>
-          </div>
-          <p className="hero-note">
-            Triage, not a verdict. A flag means “needs verification”, and every flag shows the innocent explanation next to it.
-          </p>
-        </div>
-        <figure className="hero-figure">
+          </motion.div>
+          <motion.p className="hero-note" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+            Triage, not a verdict. A flag means needs verification—and every flag shows the innocent explanation.
+          </motion.p>
+        </motion.div>
+
+        <motion.figure
+          className="hero-figure"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        >
           {hero ? (
             <>
               <Locator
@@ -120,13 +141,20 @@ export function Brief() {
               </figcaption>
             </>
           ) : (
-            <div className="figure-placeholder" />
+            <div className="figure-placeholder">Loading figure…</div>
           )}
-        </figure>
+        </motion.figure>
       </section>
 
       {summary && (
-        <section className="ledger" aria-label="Queue totals">
+        <motion.section
+          className="ledger"
+          aria-label="Queue totals"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.5 }}
+        >
           {LABEL_ORDER.map((l) => (
             <a key={l} className={`ledger-cell label-${l}`} href="#/queue">
               <span className="ledger-key">
@@ -138,7 +166,7 @@ export function Brief() {
               <span className="ledger-blurb">{LABELS[l].blurb}</span>
             </a>
           ))}
-        </section>
+        </motion.section>
       )}
 
       <section className="why">
@@ -146,28 +174,36 @@ export function Brief() {
           <h2>Why triage</h2>
           <p>
             A project missing at its pin is not automatically a ghost. It may just be misplaced on the map. Right now that
-            question is answered by hand, one record at a time, while DPWH reports{' '}
-            <a href="https://www.rappler.com/philippines/taguig-city-ghost-flood-control-projects-ping-lacson-vince-dizon-claims/" target="_blank" rel="noreferrer">
+            question is answered by hand, while DPWH reports{' '}
+            <a
+              href="https://www.rappler.com/philippines/taguig-city-ghost-flood-control-projects-ping-lacson-vince-dizon-claims/"
+              target="_blank"
+              rel="noreferrer"
+            >
               10 confirmed ghost projects and nearly 200 open investigations
             </a>
             .
           </p>
         </div>
         <div className="why-col">
-          <h2>What investigators found this month</h2>
+          <h2>What investigators found</h2>
           <p>
-            Coordinates attached to a Taguig project that point about 600 km away, and a single Davao coordinate{' '}
-            <a href="https://www.gmanetwork.com/news/topstories/nation/1003653/nbi-sees-6-potential-ghost-flood-control-projects-in-davao-city/story/" target="_blank" rel="noreferrer">
+            Coordinates attached to a Taguig project that point hundreds of kilometres away, and a single Davao coordinate{' '}
+            <a
+              href="https://www.gmanetwork.com/news/topstories/nation/1003653/nbi-sees-6-potential-ghost-flood-control-projects-in-davao-city/story/"
+              target="_blank"
+              rel="noreferrer"
+            >
               funded five times under different titles
             </a>
-            . Both patterns can be checked in the published data, for every contract, in seconds.
+            . Both patterns can be checked in the published data.
           </p>
         </div>
         <div className="why-col">
           <h2>What comes out</h2>
           <p>
-            {summary ? fmtInt(flagged) : '...'} contracts carry at least one signal. Each gets an evidence card with the
-            measured values, the benign explanation, related contracts and a next step. Everything exports to CSV.
+            {summary ? fmtInt(flagged) : '…'} contracts carry at least one signal. Each gets an evidence card with measured
+            values, the benign explanation, related contracts, and a next step. Everything exports to CSV.
           </p>
         </div>
       </section>
@@ -175,7 +211,7 @@ export function Brief() {
       <section className="cases">
         <header className="section-head">
           <h2>Three records, three different problems</h2>
-          <p>Picked automatically by the pipeline: the largest self-contradiction, the largest unexplained mismatch, and the busiest shared pin.</p>
+          <p>Picked by the pipeline: the largest self-contradiction, the largest unexplained mismatch, and the busiest shared pin.</p>
         </header>
         <div className="case-grid">
           {featured.map((f) => {
@@ -186,8 +222,8 @@ export function Brief() {
                 <Locator
                   shapes={caseShapes(f)}
                   pin={[p.lat, p.lon]}
-                  width={380}
-                  height={260}
+                  width={400}
+                  height={280}
                   distanceLabel={f.key === 'shared' ? undefined : fmtKm(f.key === 'misplaced' ? (p.sig[0]?.value ?? 0) : (p.md ?? 0))}
                 />
                 <div className="case-body">
@@ -211,27 +247,27 @@ export function Brief() {
         </header>
         <ol className="step-list">
           <li>
-            <span className="step-no">1</span>
+            <span className="step-no">01</span>
             <h3>Read both claims</h3>
             <p>
               Every record names its location twice: in the municipality field and at the end of the title. Both are
-              resolved to real municipal boundaries, and the river named in the title is matched against OpenStreetMap.
+              resolved to municipal boundaries; the river named in the title is matched against OpenStreetMap.
             </p>
           </li>
           <li>
-            <span className="step-no">2</span>
+            <span className="step-no">02</span>
             <h3>Check the ground</h3>
             <p>
-              Is the pin inside the claimed town? On land? Near the named river? Shared with other contracts? Are the
-              contract numbers, amounts and dates consistent with each other?
+              Is the pin inside the claimed town? On land? Near the named river? Shared with other contracts? Are amounts
+              and dates consistent?
             </p>
           </li>
           <li>
-            <span className="step-no">3</span>
+            <span className="step-no">03</span>
             <h3>Rank the queue</h3>
             <p>
-              Location problems go to a desk check. Consistent locations with unusual contract patterns become site-visit
-              candidates. Money at stake raises the rank but never creates a flag on its own.
+              Location problems go to a desk check. Consistent locations with unusual patterns become site-visit
+              candidates. Money raises the rank but never creates a flag alone.
             </p>
           </li>
         </ol>
@@ -244,11 +280,11 @@ export function Brief() {
             <p>
               Contract amounts bunch just under round numbers.{' '}
               <strong>{fmtInt(summary.band_95_100 ?? 0)}</strong> contracts sit between ₱95M and ₱100M; only{' '}
-              <strong>{fmtInt(summary.band_100_105 ?? 0)}</strong> sit between ₱100M and ₱105M. {Math.round(summary.at_abc_share * 100)}% were awarded within 0.1% of their approved
-              budget.
+              <strong>{fmtInt(summary.band_100_105 ?? 0)}</strong> sit between ₱100M and ₱105M.{' '}
+              {Math.round(summary.at_abc_share * 100)}% were awarded within 0.1% of their approved budget.
             </p>
             <p className="muted">
-              This describes how the budget is sliced into line items, not any single project, so GroundTruth shows it as
+              This describes how the budget is sliced into line items, not any single project—so GroundTruth shows it as
               context instead of flagging thousands of contracts for it.
             </p>
           </div>
@@ -266,7 +302,11 @@ export function Brief() {
         <p>
           It cannot prove a structure exists or does not. Only a site visit can. And it only sees what was published: the
           ₱55.7M Piel riverwall in Baliwag that{' '}
-          <a href="https://newsinfo.inquirer.net/2098529/its-strike-2-in-bulacan-as-marcos-flags-p56-m-ghost-flood-project" target="_blank" rel="noreferrer">
+          <a
+            href="https://newsinfo.inquirer.net/2098529/its-strike-2-in-bulacan-as-marcos-flags-p56-m-ghost-flood-project"
+            target="_blank"
+            rel="noreferrer"
+          >
             the President found missing in August 2025
           </a>{' '}
           was reportedly not among the 9,855 published records at all.
