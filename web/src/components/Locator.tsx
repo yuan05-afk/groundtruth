@@ -34,6 +34,18 @@ function centroid(g: Geom): [number, number] {
   return n ? [x / n, y / n] : [0, 0]
 }
 
+function bbox(g: Geom): [number, number, number, number] {
+  let [a, b, c, d] = [Infinity, Infinity, -Infinity, -Infinity]
+  for (const ring of rings(g))
+    for (const [x, y] of ring) {
+      a = Math.min(a, x)
+      b = Math.min(b, y)
+      c = Math.max(c, x)
+      d = Math.max(d, y)
+    }
+  return [a, b, c, d]
+}
+
 function shortName(name: string, max = 22) {
   if (name.length <= max) return name
   return name.slice(0, max - 1) + '...'
@@ -46,9 +58,19 @@ type Props = {
   height?: number
   distanceLabel?: string
   pinLabel?: string
+  /** Extra contracts on the same pin (shared-pin cases). */
+  stackCount?: number
 }
 
-export function Locator({ shapes, pin, width = 520, height = 380, distanceLabel, pinLabel }: Props) {
+export function Locator({
+  shapes,
+  pin,
+  width = 520,
+  height = 380,
+  distanceLabel,
+  pinLabel,
+  stackCount = 0,
+}: Props) {
   const [outline, setOutline] = useState<Geom | null>(null)
   const [ready, setReady] = useState(false)
 
@@ -73,8 +95,6 @@ export function Locator({ shapes, pin, width = 520, height = 380, distanceLabel,
   const actual = shapes.find((s) => s.role === 'actual')
 
   const view = useMemo(() => {
-    // Long spans: fit to town centroids + pin so markers stay readable.
-    // Short spans: fit to full polygons so town outlines matter.
     const claimedC = claimed ? centroid(claimed.geometry) : null
     const actualC = actual ? centroid(actual.geometry) : null
     const probe: number[][] = [[pin[1], pin[0]]]
@@ -117,7 +137,8 @@ export function Locator({ shapes, pin, width = 520, height = 380, distanceLabel,
     const kx = Math.cos((midLat * Math.PI) / 180) || 1
     let w = Math.max((maxX - minX) * kx, longRange ? 0.8 : 0.04)
     let h = Math.max(maxY - minY, longRange ? 0.8 : 0.04)
-    const pad = longRange ? 0.55 : shapes.length > 1 ? 0.35 : 0.45
+    // Leave room for labels and legend; local diagrams need more pad so the town is not cropped.
+    const pad = longRange ? 0.55 : shapes.length > 1 ? 0.42 : 0.55
     const scale = Math.min(width / (w * (1 + pad * 2)), height / (h * (1 + pad * 2)))
     const cx = (minX + maxX) / 2
     const cy = (minY + maxY) / 2
@@ -137,9 +158,13 @@ export function Locator({ shapes, pin, width = 520, height = 380, distanceLabel,
   const pinXY = view.project(pin[1], pin[0])
   const claimedXY = claimed ? view.project(...centroid(claimed.geometry)) : null
   const actualXY = actual ? view.project(...centroid(actual.geometry)) : null
-  const showConnector = claimedXY && Math.hypot(claimedXY[0] - pinXY[0], claimedXY[1] - pinXY[1]) > 28
-  // Long-range cases need the PH outline for context; short cases skip it.
+
+  // Only draw the distance line when the story is a real mismatch (caller passed a distance).
+  const showConnector = Boolean(
+    distanceLabel && claimedXY && Math.hypot(claimedXY[0] - pinXY[0], claimedXY[1] - pinXY[1]) > 40,
+  )
   const showLand = Boolean(outline && view.spanKm >= 80)
+  const local = !view.longRange
 
   if (!ready && !shapes.length) {
     return (
@@ -151,16 +176,33 @@ export function Locator({ shapes, pin, width = 520, height = 380, distanceLabel,
 
   const hatchId = `hatch-${width}-${height}`
   const clipId = `frame-${width}-${height}`
+  const plateId = `plate-${width}-${height}`
+
+  /** Place a label just outside a shape bbox so it does not sit on the fill. */
+  const outsideLabel = (g: Geom, prefer: 'right' | 'left' | 'top' | 'bottom'): [number, number] => {
+    const [a, b, c, d] = bbox(g)
+    const corners = {
+      right: view.project(c, (b + d) / 2),
+      left: view.project(a, (b + d) / 2),
+      top: view.project((a + c) / 2, d),
+      bottom: view.project((a + c) / 2, b),
+    }
+    const [x, y] = corners[prefer]
+    const pad = 14
+    if (prefer === 'right') return [Math.min(width - 8, x + pad), y]
+    if (prefer === 'left') return [Math.max(8, x - pad), y]
+    if (prefer === 'top') return [x, Math.max(18, y - pad)]
+    return [x, Math.min(height - 56, y + pad)]
+  }
 
   const labelBlock = (
     xy: [number, number],
     s: Shape,
     role: string,
     anchor: 'start' | 'middle' | 'end',
-    dy: number,
   ) => {
     const x = xy[0]
-    const y = xy[1] + dy
+    const y = xy[1]
     return (
       <g className="locator-label">
         <text x={x} y={y} className="locator-name" textAnchor={anchor}>
@@ -178,8 +220,17 @@ export function Locator({ shapes, pin, width = 520, height = 380, distanceLabel,
     )
   }
 
-  // Prefer putting claimed label left/top and pin/actual right/bottom when far apart.
-  const claimedAbove = claimedXY ? claimedXY[1] < pinXY[1] : true
+  const claimedLabelXY =
+    claimed && local
+      ? outsideLabel(claimed.geometry, pinXY[0] < width * 0.5 ? 'right' : 'left')
+      : claimedXY
+  const actualLabelXY =
+    actual && local && !view.longRange
+      ? outsideLabel(actual.geometry, claimedLabelXY && claimedLabelXY[0] > width * 0.5 ? 'left' : 'right')
+      : actualXY
+
+  const stack = Math.max(0, stackCount)
+  const pinCaption = pinLabel || (stack > 0 ? `${stack + 1} contracts` : null)
 
   return (
     <svg className="locator" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Locator diagram">
@@ -190,15 +241,24 @@ export function Locator({ shapes, pin, width = 520, height = 380, distanceLabel,
         <clipPath id={clipId}>
           <rect x="0" y="0" width={width} height={height} />
         </clipPath>
+        <linearGradient id={plateId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#ececec" />
+          <stop offset="100%" stopColor="#e2e2e2" />
+        </linearGradient>
       </defs>
+
+      {/* Ground plate so the figure never reads as a blank unfinished box. */}
+      <rect className="locator-plate" x="0" y="0" width={width} height={height} fill={`url(#${plateId})`} />
+      <rect className="locator-frame" x="0.5" y="0.5" width={width - 1} height={height - 1} />
+
       <g clipPath={`url(#${clipId})`}>
         {showLand && outline && <path d={path(outline)} className="locator-land" />}
 
-        {!view.longRange &&
+        {local &&
           shapes
             .filter((s) => s.role === 'actual')
             .map((s, k) => <path key={`a${k}`} d={path(s.geometry)} className="locator-actual" />)}
-        {!view.longRange &&
+        {local &&
           shapes
             .filter((s) => s.role === 'claimed')
             .map((s, k) => (
@@ -228,26 +288,54 @@ export function Locator({ shapes, pin, width = 520, height = 380, distanceLabel,
           </>
         )}
 
-        {claimed && claimedXY &&
-          labelBlock(claimedXY, claimed, 'Municipality field', 'middle', claimedAbove ? -28 : 22)}
-
-        {actual && actualXY && !view.longRange &&
+        {claimed && claimedLabelXY &&
           labelBlock(
-            actualXY,
+            claimedLabelXY,
+            claimed,
+            'Municipality field',
+            local ? (claimedLabelXY[0] < width * 0.5 ? 'start' : 'end') : 'middle',
+          )}
+
+        {actual && actualLabelXY && local &&
+          labelBlock(
+            actualLabelXY,
             actual,
             'Pin falls here',
-            'middle',
-            claimed && actualXY[1] > (claimedXY?.[1] ?? 0) ? 22 : -28,
+            actualLabelXY[0] < width * 0.5 ? 'start' : 'end',
           )}
+
+        {/* Shared-pin stack: concentric rings so "many contracts" is visible. */}
+        {stack > 0 &&
+          [18, 14, 10].map((r, i) => (
+            <circle
+              key={r}
+              cx={pinXY[0]}
+              cy={pinXY[1]}
+              r={r}
+              className="locator-pin-stack"
+              opacity={0.35 - i * 0.08}
+            />
+          ))}
 
         <circle cx={pinXY[0]} cy={pinXY[1]} r={11} className="locator-pin-ring" />
         <circle cx={pinXY[0]} cy={pinXY[1]} r={4} className="locator-pin" />
 
         {view.longRange && actual &&
-          labelBlock(pinXY, actual, pinLabel || 'Recorded pin', 'middle', claimedAbove ? 22 : -28)}
-        {!view.longRange && pinLabel && (
-          <text x={pinXY[0] + 14} y={pinXY[1] + 4} className="locator-pin-label">
-            {pinLabel}
+          labelBlock(
+            [pinXY[0], pinXY[1] + (claimedXY && claimedXY[1] < pinXY[1] ? 28 : -34)],
+            actual,
+            pinCaption || 'Recorded pin',
+            'middle',
+          )}
+
+        {local && pinCaption && (
+          <text
+            x={pinXY[0] + (stack > 0 ? 20 : 14)}
+            y={pinXY[1] + 4}
+            className="locator-pin-label"
+            textAnchor="start"
+          >
+            {pinCaption}
           </text>
         )}
       </g>
@@ -259,7 +347,7 @@ export function Locator({ shapes, pin, width = 520, height = 380, distanceLabel,
         </text>
         <circle cx="6" cy="28" r="4" className="locator-pin" />
         <text x="18" y="31" className="locator-legend-text">
-          Recorded pin
+          {stack > 0 ? 'Shared pin' : 'Recorded pin'}
         </text>
       </g>
     </svg>

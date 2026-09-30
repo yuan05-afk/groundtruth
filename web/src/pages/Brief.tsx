@@ -274,6 +274,12 @@ export function Brief() {
                   width={400}
                   height={280}
                   distanceLabel={f.key === 'shared' ? undefined : fmtKm(f.key === 'misplaced' ? (p.sig[0]?.value ?? 0) : (p.md ?? 0))}
+                  stackCount={f.key === 'shared' ? (p.sig.find((s) => s.code === 'shared_pin')?.value ?? p.dup.length) : 0}
+                  pinLabel={
+                    f.key === 'shared'
+                      ? `${1 + (p.sig.find((s) => s.code === 'shared_pin')?.value ?? p.dup.length)} contracts`
+                      : undefined
+                  }
                 />
                 <div className="case-body">
                   <span className={`chip chip-${p.L}`}>{LABELS[p.L].name}</span>
