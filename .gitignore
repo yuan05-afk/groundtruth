@@ -1,0 +1,36 @@
+# Dependencies & build
+node_modules/
+web/dist/
+web/.vercel/
+**/__pycache__/
+*.py[cod]
+.Python
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.sw?
+
+# Logs
+*.log
+npm-debug.log*
+
+# Demo captures / rendered video
+demo/frames/
+demo/*.mp4
+demo/*.webm
+
+# Pipeline: huge raw downloads (rebuild locally; see README / PRD)
+pipeline/data/raw/philippines-latest.osm.pbf
+pipeline/data/raw/adm3_full.geojson
+
+# Nested clone metadata inside raw SSP mirror
+pipeline/data/raw/ssp/.git/
