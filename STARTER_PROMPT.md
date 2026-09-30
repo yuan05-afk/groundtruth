@@ -51,9 +51,9 @@ WEB (./web: Vite + React + TypeScript + MapLibre GL, static, no backend)
 - Pages: Brief (landing with 3 real featured cases), Queue (filters + list + map + evidence drawer),
   Method (checks, thresholds, limits, credits).
 - Evidence card: pin, claimed municipality outline, matched waterway connector line, satellite toggle,
-  signals with named rule codes (OUTSIDE_CLAIMED_TOWN, SHARED_PIN, …) + value + benign explanation,
+  signals with named rule codes (OUTSIDE_CLAIMED_TOWN, SHARED_PIN, ...) + value + benign explanation,
   related contracts, raw record fields, disclaimer.
-- Inspector-capacity slider: “if you can inspect only N, keep the top N.”
+- Inspector-capacity slider: "if you can inspect only N, keep the top N."
 - CSV export of the current filter. Deep links (#/queue/<index>) so a card can be shared.
 - LovHack winner patterns: live public demo, deterministic scores with evidence first, honest
   insufficient-data state, Method page with limits, no AI required at runtime.

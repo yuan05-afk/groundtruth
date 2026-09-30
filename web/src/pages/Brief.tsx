@@ -18,13 +18,15 @@ import {
 
 function caseShapes(f: Featured) {
   const p = f.project
-  const shapes: { geometry: GeoJSON.Geometry; role: 'claimed' | 'actual'; name: string }[] = []
+  const shapes: { geometry: GeoJSON.Geometry; role: 'claimed' | 'actual'; name: string; province?: string }[] = []
   const claimedId = f.key === 'misplaced' ? pickFar(f) : p.sm
   if (p.am !== null && f.shapes[p.am] && p.am !== claimedId) {
-    shapes.push({ geometry: f.shapes[p.am].geometry, role: 'actual', name: f.shapes[p.am].name })
+    const s = f.shapes[p.am]
+    shapes.push({ geometry: s.geometry, role: 'actual', name: s.name, province: s.province })
   }
   if (claimedId !== null && f.shapes[claimedId]) {
-    shapes.push({ geometry: f.shapes[claimedId].geometry, role: 'claimed', name: f.shapes[claimedId].name })
+    const s = f.shapes[claimedId]
+    shapes.push({ geometry: s.geometry, role: 'claimed', name: s.name, province: s.province })
   }
   return shapes
 }
@@ -97,16 +99,45 @@ export function Brief() {
             GroundTruth
           </motion.p>
           <motion.p className="eyebrow" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
-            Philippine flood control · {summary ? fmtInt(summary.records) : '9,855'} public contracts
+            Flood-control verification, Philippines, {summary ? fmtInt(summary.records) : '9,855'} contracts
           </motion.p>
           <motion.h1 variants={fadeUp} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
-            The record says a flood wall was built here.
-            <em> So we checked where “here” is.</em>
+            Public flood projects claim a town.
+            <em> Many pins are somewhere else.</em>
           </motion.h1>
           <motion.p className="lede" variants={fadeUp} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
-            Every published DPWH flood control contract is checked against municipal boundaries, rivers, and the rest of
-            the record—then sorted into four piles: fix the record, visit the site, leave it for now, or cannot tell.
+            GroundTruth is an inspection queue for the ₱547B flood-control record: it measures whether each contract's
+            pin matches the town it claims, then sorts what to fix on paper, what to visit, and what to leave alone.
           </motion.p>
+          <motion.ol className="hero-beats" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+            <li>
+              <span className="hero-beat-n" aria-hidden="true">
+                01
+              </span>
+              <div className="hero-beat-body">
+                <strong>Problem</strong>
+                <p>A missing structure at the pin may be a ghost, or a wrong coordinate.</p>
+              </div>
+            </li>
+            <li>
+              <span className="hero-beat-n" aria-hidden="true">
+                02
+              </span>
+              <div className="hero-beat-body">
+                <strong>Check</strong>
+                <p>Boundaries, rivers, and duplicate pins across all published contracts.</p>
+              </div>
+            </li>
+            <li>
+              <span className="hero-beat-n" aria-hidden="true">
+                03
+              </span>
+              <div className="hero-beat-body">
+                <strong>Output</strong>
+                <p>A ranked queue with evidence, not a guilt ranking.</p>
+              </div>
+            </li>
+          </motion.ol>
           <motion.div className="hero-actions" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
             <a className="btn btn-primary" href="#/queue">
               Open the inspection queue
@@ -116,7 +147,7 @@ export function Brief() {
             </a>
           </motion.div>
           <motion.p className="hero-note" variants={fadeUp} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
-            Triage, not a verdict. A flag means needs verification—and every flag shows the innocent explanation.
+            Triage, not a verdict. Every flag shows the innocent explanation.
           </motion.p>
         </motion.div>
 
@@ -141,7 +172,7 @@ export function Brief() {
               </figcaption>
             </>
           ) : (
-            <div className="figure-placeholder">Loading figure…</div>
+            <div className="figure-placeholder">Loading figure...</div>
           )}
         </motion.figure>
       </section>
@@ -170,11 +201,17 @@ export function Brief() {
       )}
 
       <section className="why">
-        <div className="why-col">
-          <h2>Why triage</h2>
+        <motion.div
+          className="why-col"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.45 }}
+        >
+          <h2>The bottleneck</h2>
           <p>
-            A project missing at its pin is not automatically a ghost. It may just be misplaced on the map. Right now that
-            question is answered by hand, while DPWH reports{' '}
+            Verification is slower than publication. A blank pin is not automatically a ghost; it may be misplaced. Hand
+            checks cannot keep up while DPWH reports{' '}
             <a
               href="https://www.rappler.com/philippines/taguig-city-ghost-flood-control-projects-ping-lacson-vince-dizon-claims/"
               target="_blank"
@@ -184,11 +221,17 @@ export function Brief() {
             </a>
             .
           </p>
-        </div>
-        <div className="why-col">
-          <h2>What investigators found</h2>
+        </motion.div>
+        <motion.div
+          className="why-col"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.45, delay: 0.06 }}
+        >
+          <h2>What the data already shows</h2>
           <p>
-            Coordinates attached to a Taguig project that point hundreds of kilometres away, and a single Davao coordinate{' '}
+            Coordinates for a Taguig project that point hundreds of kilometres away, and a single Davao pin{' '}
             <a
               href="https://www.gmanetwork.com/news/topstories/nation/1003653/nbi-sees-6-potential-ghost-flood-control-projects-in-davao-city/story/"
               target="_blank"
@@ -196,16 +239,22 @@ export function Brief() {
             >
               funded five times under different titles
             </a>
-            . Both patterns can be checked in the published data.
+            . Both patterns are measurable in the published record.
           </p>
-        </div>
-        <div className="why-col">
-          <h2>What comes out</h2>
+        </motion.div>
+        <motion.div
+          className="why-col"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.45, delay: 0.12 }}
+        >
+          <h2>What GroundTruth gives you</h2>
           <p>
-            {summary ? fmtInt(flagged) : '…'} contracts carry at least one signal. Each gets an evidence card with measured
-            values, the benign explanation, related contracts, and a next step. Everything exports to CSV.
+            {summary ? fmtInt(flagged) : '...'} contracts with at least one signal, ranked for desk check or site visit.
+            Each evidence card shows the measurement, the benign explanation, related contracts, and a next step.
           </p>
-        </div>
+        </motion.div>
       </section>
 
       <section className="cases">
@@ -284,7 +333,7 @@ export function Brief() {
               {Math.round(summary.at_abc_share * 100)}% were awarded within 0.1% of their approved budget.
             </p>
             <p className="muted">
-              This describes how the budget is sliced into line items, not any single project—so GroundTruth shows it as
+              This describes how the budget is sliced into line items, not any single project, so GroundTruth shows it as
               context instead of flagging thousands of contracts for it.
             </p>
           </div>

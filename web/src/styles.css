@@ -1,5 +1,5 @@
 /**
- * GroundTruth — museum white + ink black
+ * GroundTruth - museum white + ink black
  * Labels via weight/pattern only. No cream, terracotta, purple, glow.
  */
 
@@ -123,6 +123,66 @@ h3 {
   line-height: 1.6;
   color: var(--ink-2);
   max-width: 36rem;
+  margin: 0 0 1.15rem;
+}
+
+.hero-beats {
+  list-style: none;
+  margin: 0 0 1.6rem;
+  padding: 0.85rem 0 0;
+  border-top: 1px solid var(--ink);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem 1.1rem;
+  max-width: 38rem;
+  counter-reset: none;
+}
+
+.hero-beats li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.45rem 0.55rem;
+  align-items: start;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.hero-beat-n {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  padding-top: 0.12rem;
+}
+
+.hero-beat-body strong {
+  display: block;
+  font-family: var(--display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin: 0 0 0.2rem;
+  text-transform: none;
+}
+
+.hero-beat-body p {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .hero-beats {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
 }
 
 .section-head {
@@ -140,7 +200,7 @@ h3 {
   max-width: 40rem;
 }
 
-/* —— Top bar —— */
+/* -- Top bar -- */
 
 .topbar {
   position: sticky;
@@ -203,7 +263,7 @@ h3 {
   border-bottom-color: var(--ink);
 }
 
-/* —— Buttons —— */
+/* -- Buttons -- */
 
 .btn {
   display: inline-flex;
@@ -343,7 +403,7 @@ h3 {
   font-weight: 500;
 }
 
-/* —— Brief / landing —— */
+/* -- Brief / landing -- */
 
 .brief {
   max-width: 1120px;
@@ -655,7 +715,7 @@ h3 {
   max-width: 48rem;
 }
 
-/* —— Queue —— */
+/* -- Queue -- */
 
 .queue {
   display: grid;
@@ -676,6 +736,29 @@ h3 {
   flex-shrink: 0;
   padding: 0.75rem 0.85rem 0.65rem;
   border-bottom: 1px solid var(--line);
+}
+
+.queue-framing {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.queue-kicker {
+  margin: 0 0 0.25rem;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.queue-promise {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--ink-3);
 }
 
 .tabs {
@@ -840,10 +923,10 @@ h3 {
   left: 0;
   right: 0;
   display: grid;
-  grid-template-columns: 3px 1fr auto;
-  gap: 0.6rem;
+  grid-template-columns: 4px 1fr auto;
+  gap: 0.7rem;
   width: 100%;
-  padding: 0.7rem 0.85rem 0.7rem 0;
+  padding: 0.85rem 0.9rem 0.85rem 0;
   border-bottom: 1px solid var(--line);
   text-align: left;
   background: var(--paper);
@@ -866,7 +949,7 @@ h3 {
 }
 .rail-field {
   background: transparent;
-  box-shadow: inset 0 0 0 1px var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--ink);
 }
 .rail-low {
   background: var(--low);
@@ -884,8 +967,9 @@ h3 {
 }
 
 .row-title {
-  font-size: 0.82rem;
-  line-height: 1.3;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.35;
   color: var(--ink);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -896,8 +980,8 @@ h3 {
 .row-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: 0.7rem;
+  gap: 0.35rem 0.75rem;
+  font-size: 0.72rem;
   color: var(--ink-3);
 }
 
@@ -905,22 +989,25 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
-  margin-top: 0.1rem;
+  margin-top: 0.15rem;
 }
 
 .row-score {
   align-self: start;
-  font-size: 0.78rem;
-  color: var(--ink-3);
-  padding-top: 0.1rem;
-  min-width: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink);
+  padding-top: 0.05rem;
+  min-width: 1.75rem;
   text-align: right;
+  letter-spacing: -0.02em;
 }
 
 .stage {
   position: relative;
   min-width: 0;
   background: var(--paper-2);
+  overflow: hidden;
 }
 
 .map,
@@ -957,23 +1044,35 @@ h3 {
 
 .legend {
   position: absolute;
+  /* Clear the MapLibre stack: scale (~21) + gap + zoom (~64) + margin (~14) ≈ 110px. */
   left: 0.85rem;
-  bottom: 0.85rem;
-  z-index: 5;
+  bottom: 7.25rem;
+  right: auto;
+  z-index: 4;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.55rem 0.9rem;
-  padding: 0.5rem 0.7rem;
-  background: rgba(255, 255, 255, 0.94);
+  align-items: center;
+  gap: 0.45rem 0.85rem;
+  padding: 0.45rem 0.65rem;
+  width: max-content;
+  max-width: calc(100% - 1.7rem);
+  background: rgba(255, 255, 255, 0.96);
   border: 1px solid var(--line);
   font-size: 0.7rem;
   color: var(--ink-3);
+  pointer-events: none;
 }
 
 .legend span {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
+  pointer-events: none;
+}
+
+/* Keep legend clear of the evidence drawer. */
+.stage:has(.card) .legend {
+  max-width: min(32rem, calc(100% - 1.7rem - min(26rem, 50%)));
 }
 
 .legend-dash {
@@ -988,7 +1087,7 @@ h3 {
   border-top-style: solid;
 }
 
-/* —— Evidence card —— */
+/* -- Evidence card -- */
 
 .card {
   position: absolute;
@@ -1276,7 +1375,7 @@ h3 {
   line-height: 1.45;
 }
 
-/* —— Method —— */
+/* -- Method -- */
 
 .method {
   max-width: 800px;
@@ -1393,7 +1492,7 @@ h3 {
   margin-bottom: 0.45rem;
 }
 
-/* —— Histogram —— */
+/* -- Histogram -- */
 
 .histogram {
   width: 100%;
@@ -1424,7 +1523,7 @@ h3 {
   fill: #8a8a8a;
 }
 
-/* —— Locator —— */
+/* -- Locator -- */
 
 .locator {
   width: 100%;
@@ -1434,25 +1533,35 @@ h3 {
 }
 
 .locator-land {
-  fill: none;
-  stroke: #c8c8c8;
-  stroke-width: 0.8;
+  fill: rgba(10, 10, 10, 0.03);
+  stroke: #b0b0b0;
+  stroke-width: 0.9;
   vector-effect: non-scaling-stroke;
 }
 
 .locator-actual {
-  fill: rgba(10, 10, 10, 0.08);
+  fill: rgba(10, 10, 10, 0.1);
   stroke: #0a0a0a;
-  stroke-width: 1.4;
+  stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
 
 .locator-claimed {
   fill: url(#hatch);
   stroke: #0a0a0a;
-  stroke-width: 1.4;
+  stroke-width: 1.5;
   stroke-dasharray: 4 3;
   vector-effect: non-scaling-stroke;
+}
+
+.locator-claimed-mark {
+  stroke: #0a0a0a;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 2;
+}
+
+.locator-claimed-dot {
+  fill: #0a0a0a;
 }
 
 .locator-hatch {
@@ -1463,7 +1572,7 @@ h3 {
 
 .locator-connector {
   stroke: #0a0a0a;
-  stroke-width: 1.2;
+  stroke-width: 1.4;
   stroke-dasharray: 5 4;
   fill: none;
   vector-effect: non-scaling-stroke;
@@ -1471,27 +1580,47 @@ h3 {
 
 .locator-distance {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   fill: #0a0a0a;
+  paint-order: stroke fill;
+  stroke: #f5f5f5;
+  stroke-width: 4px;
+}
+
+.locator-name {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  fill: #0a0a0a;
+  paint-order: stroke fill;
+  stroke: #f5f5f5;
+  stroke-width: 4px;
+}
+
+.locator-province {
+  font-family: var(--sans);
+  font-size: 10px;
+  fill: #6b6b6b;
   paint-order: stroke fill;
   stroke: #f5f5f5;
   stroke-width: 3px;
 }
 
-.locator-name {
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 500;
-  fill: #0a0a0a;
+.locator-role {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  fill: #6b6b6b;
   paint-order: stroke fill;
   stroke: #f5f5f5;
   stroke-width: 3px;
 }
 
 .locator-pin-ring {
-  fill: none;
+  fill: #ffffff;
   stroke: #0a0a0a;
-  stroke-width: 1.5;
+  stroke-width: 1.75;
 }
 
 .locator-pin {
@@ -1508,7 +1637,13 @@ h3 {
   stroke-width: 3px;
 }
 
-/* —— MapLibre —— */
+.locator-legend-text {
+  font-family: var(--sans);
+  font-size: 10px;
+  fill: #6b6b6b;
+}
+
+/* -- MapLibre -- */
 
 .maplibregl-ctrl-attrib {
   font-size: 10px !important;
@@ -1545,14 +1680,47 @@ h3 {
   color: var(--ink);
 }
 
+.maplibregl-ctrl-bottom-left {
+  z-index: 6;
+  margin: 0 0 0.85rem 0.85rem !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.maplibregl-ctrl-bottom-left .maplibregl-ctrl {
+  margin: 0 !important;
+}
+
 .maplibregl-ctrl-group {
   border-radius: 0 !important;
   border: 1px solid var(--ink) !important;
   box-shadow: none !important;
   overflow: hidden;
+  background: rgba(255, 255, 255, 0.96) !important;
 }
 
-/* —— Responsive —— */
+.maplibregl-ctrl-group button {
+  width: 2rem !important;
+  height: 2rem !important;
+}
+
+/* MapLibre's default scale is open-top; draw a full box so it does not look clipped. */
+.maplibregl-ctrl-scale {
+  border: 1px solid var(--ink) !important;
+  border-top: 1px solid var(--ink) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: var(--ink-2) !important;
+  font-family: var(--mono) !important;
+  font-size: 0.65rem !important;
+  line-height: 1 !important;
+  height: auto !important;
+  padding: 0.28rem 0.45rem !important;
+  box-sizing: border-box;
+}
+
+/* -- Responsive -- */
 
 @media (max-width: 980px) {
   .hero,
@@ -1578,20 +1746,22 @@ h3 {
 
   .queue {
     grid-template-columns: 1fr;
-    grid-template-rows: 42vh 58vh;
-    height: auto;
-    min-height: calc(100vh - var(--topbar));
+    /* Percent of the queue box (already 100vh - topbar), not viewport vh. */
+    grid-template-rows: 42% 58%;
+    height: calc(100vh - var(--topbar));
+    min-height: 0;
   }
 
   body[data-page='queue'] {
-    overflow: auto;
-    height: auto;
+    overflow: hidden;
+    height: 100vh;
   }
 
   .panel {
     border-right: none;
     border-bottom: 1px solid var(--line);
-    max-height: 42vh;
+    max-height: none;
+    min-height: 0;
   }
 
   .card {
@@ -1601,6 +1771,20 @@ h3 {
     bottom: 0;
     width: 100%;
     max-height: 55%;
+  }
+
+  .legend {
+    left: 0.85rem;
+    right: 0.85rem;
+    bottom: 7.25rem;
+    max-width: none;
+    width: auto;
+  }
+
+  .stage:has(.card) .legend {
+    right: 0.85rem;
+    bottom: calc(55% + 0.55rem);
+    max-width: none;
   }
 }
 
@@ -1639,7 +1823,8 @@ h3 {
 @media print {
   .topbar,
   .map-controls,
-  .legend {
+  .legend,
+  .intro {
     display: none !important;
   }
 
@@ -1648,4 +1833,90 @@ h3 {
     width: 100%;
     border: 1px solid #000;
   }
+}
+
+/* -- Opening intro -- */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.intro-skip {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.intro-skip:hover {
+  color: var(--ink);
+}
+
+.intro-stage {
+  max-width: 32rem;
+  text-align: center;
+}
+
+.intro-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.75rem;
+}
+
+.intro-diagram {
+  width: min(100%, 420px);
+  height: auto;
+  margin: 0 auto 1.5rem;
+  display: block;
+}
+
+.intro-label {
+  font-family: var(--sans);
+  font-size: 11px;
+  fill: #6b6b6b;
+}
+
+.intro-dist {
+  font-family: var(--mono);
+  font-size: 11px;
+  fill: #0a0a0a;
+}
+
+.intro-line {
+  margin: 0 0 0.75rem;
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 3vw, 1.65rem);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.intro-sub {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.page-queue {
+  height: calc(100vh - var(--topbar));
+}
+
+.page-queue .queue {
+  height: 100%;
 }

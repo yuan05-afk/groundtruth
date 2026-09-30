@@ -122,7 +122,7 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
   const virtualizer = useVirtualizer({
     count: filtered.length,
     getScrollElement: () => listRef.current,
-    estimateSize: () => 92,
+    estimateSize: () => 104,
     overscan: 8,
   })
 
@@ -167,6 +167,12 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
     <main className="queue">
       <section className="panel">
         <div className="panel-head">
+          <div className="queue-framing">
+            <p className="queue-kicker">Inspection queue</p>
+            <p className="queue-promise">
+              Pins that disagree with the claim, sorted so desk checks and site visits start with the strongest cases.
+            </p>
+          </div>
           <div className="tabs" role="tablist" aria-label="Label">
             {tabs.map((t) => (
               <button
@@ -198,7 +204,7 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
               onClick={() => setFiltersOpen((v) => !v)}
             >
               {filtersOpen ? 'Hide filters' : 'More filters'}
-              {(region || year || signal) && <span className="mono"> · on</span>}
+              {(region || year || signal) && <span className="mono"> (on)</span>}
             </button>
             <div className={filtersOpen ? 'filter-drawer open' : 'filter-drawer'}>
               <div className="filter-row">
@@ -243,7 +249,7 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
                   <option value="distance">Distance from claim</option>
                 </select>
               </label>
-              <button className="btn btn-small" onClick={exportCsv} disabled={!filtered.length}>
+              <button className="btn btn-small btn-quiet" onClick={exportCsv} disabled={!filtered.length}>
                 Export CSV
               </button>
             </span>
@@ -251,7 +257,7 @@ export function Queue({ selectedId }: { selectedId: number | null }) {
         </div>
 
         <div className="list" ref={listRef}>
-          {!projects && <div className="list-empty">Loading 9,855 records…</div>}
+          {!projects && <div className="list-empty">Loading 9,855 records...</div>}
           {projects && !filtered.length && <div className="list-empty">No contracts match these filters.</div>}
           <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
             {virtualizer.getVirtualItems().map((v) => {

@@ -212,7 +212,7 @@ export const SIGNALS: Record<SignalCode, { name: string; rule: string; code: str
   cost_per_metre_outlier: {
     name: 'Unusual cost per metre',
     code: 'COST_PER_M_OUTLIER',
-    rule: 'Cost per metre is a robust outlier (z of 3 or more) for its type of work.',
+    rule: 'Cost per metre is a strong outlier (z of 3 or more) for its type of work.',
   },
   implausibly_short: {
     name: 'Very short build time',

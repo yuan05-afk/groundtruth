@@ -83,4 +83,4 @@ if (fails.length) {
   console.error('FAILS:\n' + fails.join('\n'))
   process.exit(1)
 }
-console.log('audit after-pass done — PASS')
+console.log('audit after-pass done - PASS')

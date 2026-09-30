@@ -2,5 +2,10 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/((?!assets/|data/|maplibre|favicon|icons|.*\\..*).*)",
+      "destination": "/index.html"
+    }
+  ]
 }

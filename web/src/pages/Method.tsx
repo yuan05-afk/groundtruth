@@ -95,14 +95,14 @@ export function Method() {
       <section className="method-section">
         <h2>2. Two claims per record</h2>
         <p>
-          A record names its location twice: in the structured municipality field, and at the end of its title (“…,
-          Quezon, Palawan”). Both are resolved to boundaries with fuzzy matching inside the stated province, and the claim
+          A record names its location twice: in the structured municipality field, and at the end of its title ("...,
+          Quezon, Palawan"). Both are resolved to boundaries with fuzzy matching inside the stated province, and the claim
           nearest the pin is used for the verdict.
         </p>
         <p>
           This matters more than any threshold. Most of the largest raw mismatches, some over 800 km, turned out to be
           same-named towns in the wrong province while the title and the pin agree. Those records need a correction, not an
-          inspection, and GroundTruth labels them that way instead of shouting about them.
+          inspection, and GroundTruth labels them that way.
         </p>
       </section>
 
@@ -143,7 +143,7 @@ export function Method() {
         <p>
           Within a label, records are ranked by a priority score from 0 to 100:
         </p>
-        <pre className="formula">score = 100 × (1 − e^(−Σ signal strengths)) × (0.65 + 0.35 × cost percentile)</pre>
+        <pre className="formula">score = 100 x (1 - e^(-Sum signal strengths)) x (0.65 + 0.35 x cost percentile)</pre>
         <p>
           Several independent signals push a record up faster than one strong one. Money at stake raises the rank, but a
           contract is never flagged for being large.
@@ -193,9 +193,9 @@ export function Method() {
         <ul className="plain">
           <li>DPWH flood control records, published via sumbongsapangulo.ph; mirror by github.com/rukku.</li>
           <li>geoBoundaries, William &amp; Mary geoLab (CC BY 3.0 IGO).</li>
-          <li>OpenStreetMap contributors (ODbL), via Geofabrik. Basemap by OpenFreeMap. Imagery by Esri.</li>
+          <li>OpenStreetMap contributors (ODbL), via Geofabrik. Basemap and imagery by Esri.</li>
           <li>
-            Earlier public work on this data that informed the approach: BetterGov.ph visualisations and Data Dictionary’s
+            Earlier public work on this data that informed the approach: BetterGov.ph visualisations and Data Dictionary's
             analysis of duplicated projects.
           </li>
         </ul>

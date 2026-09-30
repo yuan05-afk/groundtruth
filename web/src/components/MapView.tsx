@@ -4,14 +4,19 @@ import {
   NavigationControl,
   ScaleControl,
   LngLatBounds,
+  setWorkerUrl,
   type GeoJSONSource,
   type LngLatBoundsLike,
   type MapLayerMouseEvent,
   type Map as MapLibreMapType,
+  type StyleSpecification,
 } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef } from 'react'
 import { type MuniFeature, type Project, LABELS, fmtKm, loadMunicipalities } from '../lib/data'
+
+// Vite cannot resolve the MapLibre v6 worker via import.meta.url; serve from /public.
+setWorkerUrl(`${import.meta.env.BASE_URL}maplibre-worker.mjs`)
 
 export const LABEL_COLORS = {
   records: '#0a0a0a',
@@ -57,25 +62,44 @@ function bboxOf(f: MuniFeature): [number, number, number, number] {
   return [a, b, c, d]
 }
 
-function restyle(map: MapLibreMapType) {
-  const set = (id: string, prop: string, value: unknown) => {
-    if (map.getLayer(id)) {
-      // OpenFreeMap layer paint keys vary by style version.
-      ;(map as MapLibreMapType & { setPaintProperty: (a: string, b: string, c: unknown) => void }).setPaintProperty(
-        id,
-        prop,
-        value,
-      )
-    }
-  }
-  set('background', 'background-color', '#f5f5f5')
-  set('water', 'fill-color', '#e0e0e0')
-  set('park', 'fill-color', '#eeeeee')
-  set('landcover_wood', 'fill-color', '#ececec')
-  set('landuse_residential', 'fill-color', '#f2f2f2')
-  set('waterway', 'line-color', '#b5b5b5')
-  set('building', 'fill-color', '#e8e8e8')
-  for (const id of ['boundary_2', 'boundary_3']) set(id, 'line-color', '#c0c0c0')
+const BASE_STYLE: StyleSpecification = {
+  version: 8,
+  name: 'GroundTruth greyscale',
+  // Demote font dependency: labels still work if this host is slow; basemap is raster.
+  glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
+  sources: {
+    basemap: {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+      ],
+      tileSize: 256,
+      maxzoom: 16,
+      attribution: 'Tiles (c) Esri. Source: Esri, HERE, Garmin, FAO, NOAA, USGS',
+    },
+    basemapLabels: {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+      ],
+      tileSize: 256,
+      maxzoom: 16,
+    },
+    satellite: {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      ],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: 'Imagery (c) Esri, Maxar, Earthstar Geographics',
+    },
+  },
+  layers: [
+    { id: 'basemap', type: 'raster', source: 'basemap' },
+    { id: 'basemap-labels', type: 'raster', source: 'basemapLabels' },
+    { id: 'satellite', type: 'raster', source: 'satellite', layout: { visibility: 'none' } },
+  ],
 }
 
 export function MapView({ points, selected, related, basemap, onSelect, drawerOpen }: Props) {
@@ -90,7 +114,7 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
     if (!ref.current) return
     const map = new MapLibreMap({
       container: ref.current,
-      style: 'https://tiles.openfreemap.org/styles/positron',
+      style: BASE_STYLE,
       center: [122.3, 12.2],
       zoom: 4.9,
       minZoom: 4,
@@ -106,15 +130,7 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
 
     ready.current = new Promise((resolve) => {
       map.on('load', () => {
-        restyle(map)
-        map.addSource('esri', {
-          type: 'raster',
-          tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-          tileSize: 256,
-          maxzoom: 19,
-          attribution: 'Imagery © Esri, Maxar, Earthstar Geographics',
-        })
-        map.addLayer({ id: 'esri', type: 'raster', source: 'esri', layout: { visibility: 'none' } })
+        map.resize()
 
         map.addSource('munis', { type: 'geojson', data: EMPTY })
         map.addLayer({
@@ -274,10 +290,18 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           if (f) onSelectRef.current(Number(f.properties?.i))
         })
         resolve()
+        requestAnimationFrame(() => map.resize())
+      })
+      map.on('error', (e) => {
+        console.warn('[map]', e.error?.message ?? e)
       })
     })
 
+    const ro = new ResizeObserver(() => map.resize())
+    ro.observe(ref.current)
+
     return () => {
+      ro.disconnect()
       map.remove()
       mapRef.current = null
     }
@@ -303,7 +327,10 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
     const map = mapRef.current
     ready.current?.then(() => {
       if (!map) return
-      map.setLayoutProperty('esri', 'visibility', basemap === 'satellite' ? 'visible' : 'none')
+      const sat = basemap === 'satellite'
+      if (map.getLayer('satellite')) map.setLayoutProperty('satellite', 'visibility', sat ? 'visible' : 'none')
+      if (map.getLayer('basemap')) map.setLayoutProperty('basemap', 'visibility', sat ? 'none' : 'visible')
+      if (map.getLayer('basemap-labels')) map.setLayoutProperty('basemap-labels', 'visibility', sat ? 'none' : 'visible')
     })
   }, [basemap])
 
