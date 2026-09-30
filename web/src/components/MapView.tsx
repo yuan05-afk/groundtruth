@@ -280,10 +280,10 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           source: 'sel',
           filter: ['==', ['get', 'kind'], 'claimed'],
           paint: {
-            'circle-radius': 14,
-            'circle-color': 'rgba(255,255,255,0.92)',
+            'circle-radius': 16,
+            'circle-color': '#ffffff',
             'circle-stroke-color': '#0a0a0a',
-            'circle-stroke-width': 1.6,
+            'circle-stroke-width': 2,
             'circle-stroke-opacity': 1,
           },
         })
@@ -293,10 +293,10 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
           source: 'sel',
           filter: ['==', ['get', 'kind'], 'claimed'],
           paint: {
-            'circle-radius': 3.25,
+            'circle-radius': 3.5,
             'circle-color': '#ffffff',
             'circle-stroke-color': '#0a0a0a',
-            'circle-stroke-width': 1.4,
+            'circle-stroke-width': 1.5,
           },
         })
         map.addLayer({
@@ -608,10 +608,11 @@ export function MapView({ points, selected, related, basemap, onSelect, drawerOp
 
       const container = map.getContainer()
       const narrow = container.clientWidth <= 980
-      const right = drawerOpen && !narrow ? Math.min(500, container.clientWidth * 0.5) : 60
-      const bottom = drawerOpen && narrow ? Math.min(container.clientHeight * 0.55, 448) + 28 : 72
+      // Keep the claimed-town mark out from under the evidence card on desktop.
+      const right = drawerOpen && !narrow ? Math.min(580, Math.max(460, container.clientWidth * 0.52)) : 60
+      const bottom = drawerOpen && narrow ? Math.min(container.clientHeight * 0.55, 448) + 28 : 88
       map.fitBounds(bounds as LngLatBoundsLike, {
-        padding: { top: 72, bottom, left: 56, right: right + 36 },
+        padding: { top: 80, bottom, left: 64, right: right + 48 },
         maxZoom: 14.5,
         duration: 650,
         essential: true,
