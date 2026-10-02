@@ -198,7 +198,6 @@ Writes into `web/public/data/`.
 
 - [PRD.md](./PRD.md) — product requirements and signal table
 - [DEVPOST.md](./DEVPOST.md) — hackathon submission draft
-- [STARTER_PROMPT.md](./STARTER_PROMPT.md) — agent prompt to reproduce from zero
 - Method page in the app — full rule table, limits, credits
 
 ---

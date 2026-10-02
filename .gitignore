@@ -36,3 +36,9 @@ pipeline/data/raw/adm3_full.geojson
 pipeline/data/raw/ssp/.git/
 .vercel
 .env*
+
+# Local-only authoring aids (kept on disk, not published)
+STARTER_PROMPT.md
+**/AGENTS.md
+.cursor/
+.claude/
